@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Resume Builder - Create Your Perfect Resume</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300&display=swap" rel="stylesheet">
+</head>
+  <body>
+    
+  <!-- Splash Page -->
+  <div class="hero-splash">
+    <h2>
+      Build your standout<br />
+      resume in minutes<br />
+      AI-powered, job-ready, and<br />
+      totally stress-free
+    </h2>
+  </div>
+
+  <!-- Main App -->
+  <div class="main-content">
+    <div class="container">
+      <div class="header">
+        <h1>🤖 AI Resume Builder</h1>
+        <p>Create professional, job-tailored resumes with AI assistance</p>
+        <div class="ai-badge">✨ Powered by Artificial Intelligence</div>
+      </div>
+
+      <div class="form-container">
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">📝</div>
+            <h3>Smart Content</h3>
+            <p>AI-generated bullet points and summaries</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <h3>Job Tailored</h3>
+            <p>Customized for specific job descriptions</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">📄</div>
+            <h3>Multiple Formats</h3>
+            <p>Export as PDF, TXT, or JSON</p>
+          </div>
+        </div>
+
+        <form id="resumeForm">
+          <!-- Personal Information -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">👤</span>
+              Personal Information
+            </h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" required />
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="location">Location (City, State)</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                placeholder="e.g., San Francisco, CA"
+              />
+            </div>
+            <div class="form-group">
+              <label for="linkedin">LinkedIn Profile</label>
+              <input
+                type="url"
+                id="linkedin"
+                name="linkedin"
+                placeholder="https://linkedin.com/in/yourprofile"
+              />
+            </div>
+          </div>
+
+          <!-- Professional Summary -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">📋</span>
+              Professional Summary
+            </h2>
+            <div class="form-group">
+              <label for="summary"
+                >Professional Summary (AI will enhance this)</label
+              >
+              <textarea
+                id="summary"
+                name="summary"
+                placeholder="Brief overview of your professional background, key skills, and career objectives..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">🎓</span>
+              Education
+            </h2>
+            <div id="educationContainer">
+              <div class="dynamic-item">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Degree/Certification</label>
+                    <input
+                      type="text"
+                      name="education[0][degree]"
+                      placeholder="e.g., Bachelor of Science in Computer Science"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Institution</label>
+                    <input
+                      type="text"
+                      name="education[0][institution]"
+                      placeholder="University/School name"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Graduation Year</label>
+                    <input
+                      type="text"
+                      name="education[0][year]"
+                      placeholder="2023"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>GPA (Optional)</label>
+                    <input
+                      type="text"
+                      name="education[0][gpa]"
+                      placeholder="3.8/4.0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="add-button" onclick="addEducation()">
+              + Add Another Education
+            </button>
+          </div>
+
+          <!-- Work Experience -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">💼</span>
+              Work Experience
+            </h2>
+            <div id="experienceContainer">
+              <div class="dynamic-item">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Job Title</label>
+                    <input
+                      type="text"
+                      name="experience[0][title]"
+                      placeholder="e.g., Software Developer"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Company</label>
+                    <input
+                      type="text"
+                      name="experience[0][company]"
+                      placeholder="Company name"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Start Date</label>
+                    <input
+                      type="text"
+                      name="experience[0][startDate]"
+                      placeholder="MM/YYYY"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>End Date</label>
+                    <input
+                      type="text"
+                      name="experience[0][endDate]"
+                      placeholder="MM/YYYY or Present"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label
+                    >Job Description (AI will create professional bullet
+                    points)</label
+                  >
+                  <textarea
+                    name="experience[0][description]"
+                    placeholder="Describe your key responsibilities and achievements..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="add-button" onclick="addExperience()">
+              + Add Another Position
+            </button>
+          </div>
+
+          <!-- Skills -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">⚡</span>
+              Skills
+            </h2>
+            <div class="form-group">
+              <label for="technicalSkills">Technical Skills</label>
+              <textarea
+                id="technicalSkills"
+                name="technicalSkills"
+                placeholder="e.g., Python, JavaScript, React, AWS, SQL, Machine Learning..."
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label for="softSkills">Soft Skills</label>
+              <textarea
+                id="softSkills"
+                name="softSkills"
+                placeholder="e.g., Leadership, Communication, Problem-solving, Team collaboration..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Job Description for AI Tailoring -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">🎯</span>
+              Job Description (Optional but Recommended)
+            </h2>
+            <div class="form-group">
+              <label for="jobDescription"
+                >Paste the job description here for AI optimization</label
+              >
+              <textarea
+                id="jobDescription"
+                name="jobDescription"
+                class="job-description"
+                placeholder="Paste the job posting here to help AI tailor your resume to match the specific requirements and keywords..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Generate Button -->
+          <button type="submit" class="generate-button">
+            🚀 Generate AI-Powered Resume
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

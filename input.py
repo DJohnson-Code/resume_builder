@@ -120,29 +120,40 @@ def get_experience():
             print("Job duties cannot be empty.")
             continue
 
-        # Validate date format (e.g., YYYY or YYYY-MM)
-        start_date = input("Start date (YYYY or YYYY-MM): ").strip()
-        if not (start_date.isdigit() and len(start_date) == 4) and not (
-            len(start_date) == 7
-            and start_date[:4].isdigit()
-            and start_date[4] == "-"
-            and start_date[5:7].isdigit()
-        ):
-            print("Enter a valid start date (YYYY or YYYY-MM).")
-            continue
+        # Validate date format (e.g., YYYY or MM-YYYY)
+        while True:
+            start_date = input("Start date (YYYY or MM-YYYY): ").strip()
+            if start_date.isdigit() and len(start_date) == 4:
+                break  # Valid YYYY
+            elif (
+                len(start_date) == 7
+                and start_date[2] == "-"
+                and start_date[:2].isdigit()
+                and start_date[3:].isdigit()
+                and 1 <= int(start_date[:2]) <= 12
+            ):
+                break  # Valid MM-YYYY
+            else:
+                print("Enter a valid start date (YYYY or MM-YYYY).")
 
-        end_date = input("End date (or present) (YYYY or YYYY-MM): ").strip()
-        if end_date.lower() != "present" and not (
-            (end_date.isdigit() and len(end_date) == 4)
-            or (
+        while True:
+            end_date = input("End date (or present) (YYYY or MM-YYYY): ").strip()
+            if end_date.lower() == "present":
+                break
+
+            elif end_date.isdigit() and len(end_date) == 4:
+                break
+
+            elif (
                 len(end_date) == 7
-                and end_date[:4].isdigit()
-                and end_date[4] == "-"
-                and end_date[5:7].isdigit()
-            )
-        ):
-            print("Enter a valid end date (YYYY, YYYY-MM, or 'present').")
-            continue
+                and end_date[2] == "-"
+                and 1 <= int(end_date[:2]) <= 12
+                and end_date[:2].isdigit()
+                and end_date[3:].isdigit()
+            ):
+                break
+            else:
+                print("Enter a valid end date (YYYY, MM-YYYY, or 'present').")
 
         job = {
             "job_title": job_title,
