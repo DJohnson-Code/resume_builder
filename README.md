@@ -1,4 +1,4 @@
-# Resume Builder (Work in progress, on hold)
+# Resume Builder (Work in progress)
 
 A Python CLI app that collects user input and formats a basic resume using styled terminal output via the `rich` library.
 
