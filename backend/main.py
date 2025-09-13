@@ -1,6 +1,6 @@
 # Import the Console class from the rich library for styled terminal output
 from rich.console import Console
-from input import (
+from archive_cli.input import (
     get_name,
     get_email,
     get_number,
