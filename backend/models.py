@@ -3,6 +3,7 @@ from typing import Annotated
 from datetime import date
 from pydantic import BaseModel, EmailStr, HttpUrl, constr, Field
 
+
 # PhoneIn - flexible formats for incoming phone numbers:
 # - Optional leading "+"
 # - Digits, spaces, dashes, parentheses allowed
@@ -29,7 +30,7 @@ class ResumeIn(BaseModel):
     name: str
     email: EmailStr
     phone: PhoneIn
-    location: str | None = None
+    location: LocationIn | None = None
     urls: list[HttpUrl] | None = None
     experience: list[ExperienceIn] | None = None
     skills: Annotated[list[str], Field(min_length=1)]
@@ -71,6 +72,20 @@ class EducationIn(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class LocationIn(BaseModel):
+    """
+    Raw location data from user input.
+    Fields may be inconsistent or unnormalized.
+    """
+
+    city: str
+    state: str
+    country: str
+    zip: str | None = None
+
+    model_config = {"extra": "forbid"}
+
+
 # ----------------------
 # Output Models (cleaned/normalized)
 # ----------------------
@@ -90,8 +105,6 @@ class ExperienceOut(BaseModel):
     description: list[str] = Field(default_factory=list)
     location: str | None = None
 
-    model_config = {"extra": "forbid"}
-
 
 class EducationOut(BaseModel):
     """
@@ -106,7 +119,17 @@ class EducationOut(BaseModel):
     graduation_date: str | None
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
-    model_config = {"extra": "forbid"}
+
+class LocationOut(BaseModel):
+    """
+    Normalized location data.
+    All fields should be properly formatted and standardized.
+    """
+
+    city: str
+    state: str
+    country: str
+    zip: str | None = None
 
 
 class ResumeOut(BaseModel):
@@ -121,7 +144,7 @@ class ResumeOut(BaseModel):
     cleaned_name: str
     cleaned_email: EmailStr
     cleaned_phone: PhoneOut
-    cleaned_location: str | None = None
+    cleaned_location: [LocationOut] | None = None
 
     # Structured sections
     cleaned_urls: list[HttpUrl] = Field(default_factory=list)
