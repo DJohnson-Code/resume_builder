@@ -10,7 +10,7 @@ import unicodedata
 import phonenumbers
 from dateutil import parser
 from dateutil.parser import ParserError
-from phonenumbers.phonenumberutil import NumberParseException
+from phonenumbers import PhoneNumberFormat, NumberParseException
 
 
 # =============================================================================
@@ -56,7 +56,7 @@ def to_e164(raw: str, default_region: str | None = None) -> str | None:
     try:
         n = phonenumbers.parse(raw, default_region)
         if phonenumbers.is_valid_number(n):
-            return phonenumbers.format_number(n, phonenumbers.PhoneNumberFormat.E164)
+            return phonenumbers.format_number(n, PhoneNumberFormat.E164)
         return None
     except NumberParseException:
         return None
@@ -193,6 +193,53 @@ def clean_location(location: str) -> str:
         return cleaned.title()
 
 
-# clean the urls
+def normalize_url(u: str) -> str | None:
+    """
+    Return a normalized URL key for dedup/validation or None if invalid.
+    - Ensures scheme (defaults to https)
+    - Validates netloc exists
+    - Lowercases scheme/host
+    - Strips trailing slash in path
+    """
+    if not u.startswith(("http://", "https://")):
+        u = f"https://{u}"
+
+    try:
+        p = urlparse(u)
+    except Exception:
+        return None
+
+    if not p.scheme or not p.netloc or "." not in p.netloc:
+        return None
+
+    p_norm = p._replace(
+        scheme=p.scheme.lower(), netloc=p.netloc.lower(), path=p.path.rstrip("/")
+    )
+    return urlunparse(p_norm)
+
+
+def clean_urls(urls: list[str]) -> list[str]:
+    if not urls:
+        return []
+
+    out: list[str] = []
+    seen: set[str] = set()
+
+    for raw in urls:
+        if not raw:
+            continue
+        u = clean_text(raw)
+        if not u:
+            continue
+
+        normalized = normalize_url(u)
+        if not normalized or normalized in seen:
+            continue
+
+        seen.add(normalized)
+        out.append(normalized)  # already a nice display form
+
+    return out
+
 
 # clean the skills, deduplicate
