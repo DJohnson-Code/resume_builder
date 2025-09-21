@@ -4,47 +4,47 @@ from datetime import date
 from pydantic import BaseModel, EmailStr, HttpUrl, constr, Field
 
 
-# PhoneIn - flexible formats for incoming phone numbers:
-# - Optional leading "+"
-# - Digits, spaces, dashes, parentheses allowed
-# - Total length between 10 and 15 characters
 PhoneIn = Annotated[str, constr(regex=r"^\+?\d[\d\s\-()]{9,14}$")]
 
-# PhoneOut enforces a normalized E.164-style phone number:
-# - Must start with "+"
-# - Followed by 10–15 digits only
-PhoneOut = Annotated[str, constr(regex=r"^\+\d{10,15}$")]
 
-# ----------------------
-# Input Models
-# ----------------------
+PhoneOut = Annotated[str, constr(regex=r"^\+\d{10,15}$")]
 
 
 class ResumeIn(BaseModel):
     """
-    Represents the raw resume data as received from a user or client input.
-    This model allows slightly messy/unstructured fields that will be
-    cleaned/normalized (validations file) into ResumeOut.
+    Raw resume data from user input - accepts messy, inconsistent formats.
+
+    This is the entry point for user data. Fields may contain:
+    - Inconsistent date formats ("Jan 2023", "01/2023", "2023-01")
+    - Messy text with extra spaces, inconsistent capitalization
+    - Duplicate skills/certifications
+    - Unformatted location data
+
+    All fields will be cleaned and normalized by validation functions
+    before being converted to ResumeOut.
     """
 
+    # Basic contact information (using type hints - variable_name: data_type)
     name: str
     email: EmailStr
     phone: PhoneIn
     location: LocationIn | None = None
-    urls: list[HttpUrl] | None = None
+
+    # Professional information (using type hints - variable_name: data_type)
+    urls: list[HttpUrl] | None = None  #
     experience: list[ExperienceIn] | None = None
-    skills: Annotated[list[str], Field(min_length=1)]
+    skills: Annotated[list[str], Field(min_length=1)]  # At least 1 skill
     education: list[EducationIn] | None = None
     certifications: list[str] | None = None
 
-    # Forbid any extra fields not explicitly defined
+    # Security: reject any unexpected fields from user input
     model_config = {"extra": "forbid"}
 
 
 class ExperienceIn(BaseModel):
     """
     Raw experience entry as provided in the resume input.
-    Dates and text may be inconsistent or unnormalized.
+    Dates and text may be inconsistent or uncleaned.
     """
 
     company: str
@@ -60,7 +60,7 @@ class ExperienceIn(BaseModel):
 class EducationIn(BaseModel):
     """
     Raw education entry as provided in the resume input.
-    Graduation dates and GPA may need validation/normalization.
+    Graduation dates and GPA may need validation/cleaning.
     """
 
     school: str
@@ -75,7 +75,7 @@ class EducationIn(BaseModel):
 class LocationIn(BaseModel):
     """
     Raw location data from user input.
-    Fields may be inconsistent or unnormalized.
+    Fields may be inconsistent or unclean.
     """
 
     city: str
@@ -86,14 +86,16 @@ class LocationIn(BaseModel):
     model_config = {"extra": "forbid"}
 
 
-# ----------------------
-# Output Models (cleaned/normalized)
-# ----------------------
+# =============================================================================
+# OUTPUT MODELS - Clean, normalized data ready for AI processing
+# =============================================================================
+# These models represent data after validation and cleaning
+# No extra field restrictions (allows AI to add fields)
 
 
 class ExperienceOut(BaseModel):
     """
-    Normalized version of an experience entry.
+    Cleaned version of an experience entry.
     Dates should be parsed into a consistent format (e.g., YYYY-MM).
     Text fields should be whitespace-trimmed and standardized.
     """
@@ -108,7 +110,7 @@ class ExperienceOut(BaseModel):
 
 class EducationOut(BaseModel):
     """
-    Normalized version of an education entry.
+    Cleaned version of an education entry.
     Graduation date should be standardized.
     GPA must fall between 0.0 and 4.0 if provided.
     """
@@ -122,7 +124,7 @@ class EducationOut(BaseModel):
 
 class LocationOut(BaseModel):
     """
-    Normalized location data.
+    Cleaned location data.
     All fields should be properly formatted and standardized.
     """
 
@@ -134,24 +136,49 @@ class LocationOut(BaseModel):
 
 class ResumeOut(BaseModel):
     """
-    The cleaned and validated resume object returned by the system.
-    All fields should be normalized into predictable formats.
+    Clean, validated resume data ready for AI processing or final output.
+
+    This model represents the result of the validation pipeline:
+    ResumeIn → Validation Functions → ResumeOut
+
+    All fields are normalized and consistent:
+    - Dates in YYYY-MM format
+    - Names properly capitalized
+    - Skills/certifications deduplicated
+    - Phone numbers in E.164 format
+    - Locations properly formatted
+
+    This data can be safely sent to AI APIs or used for resume generation.
     """
 
-    ok: bool  # Indicates whether normalization/validation succeeded
+    # Validation status
+    ok: bool  # True if validation succeeded, False if critical errors occurred
 
-    # Contact info
-    cleaned_name: str
-    cleaned_email: EmailStr
-    cleaned_phone: PhoneOut
-    cleaned_location: [LocationOut] | None = None
+    # Cleaned contact information
+    cleaned_name: str  # Properly capitalized, titles removed
+    cleaned_email: EmailStr  # Validated email format
+    cleaned_phone: PhoneOut  # E.164 format (+1234567890)
+    cleaned_location: LocationOut | None = None  # Formatted location data
 
-    # Structured sections
-    cleaned_urls: list[HttpUrl] = Field(default_factory=list)
-    cleaned_experience: list[ExperienceOut] = Field(default_factory=list)
-    cleaned_skills: list[str] = Field(default_factory=list)
-    cleaned_education: list[EducationOut] = Field(default_factory=list)
-    cleaned_certifications: list[str] = Field(default_factory=list)
+    # Cleaned professional sections
+    cleaned_urls: list[HttpUrl] = Field(default_factory=list)  # Validated URLs
+    cleaned_experience: list[ExperienceOut] = Field(
+        default_factory=list
+    )  # Cleaned work history
 
-    # Warnings hold non-critical issues (e.g., unparseable dates, unknown skills)
-    warnings: list[str] = Field(default_factory=list)
+    cleaned_skills: list[str] = Field(
+        default_factory=list
+    )  # Deduplicated, cleaned skills
+
+    cleaned_education: list[EducationOut] = Field(
+        default_factory=list
+    )  # Cleaned education
+
+    cleaned_certifications: list[str] = Field(
+        default_factory=list
+    )  # Deduplicated certifications
+
+    # Non-critical issues found during validation
+    warnings: list[str] = Field(
+        default_factory=list
+    )  # e.g., "No education provided", "Unparseable date"
