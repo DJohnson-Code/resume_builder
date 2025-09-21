@@ -1,13 +1,10 @@
 from __future__ import annotations
 from typing import Annotated
 from datetime import date
-from pydantic import BaseModel, EmailStr, HttpUrl, constr, Field
+from pydantic import BaseModel, EmailStr, HttpUrl, Field, field_serializer
 
-
-PhoneIn = Annotated[str, constr(regex=r"^\+?\d[\d\s\-()]{9,14}$")]
-
-
-PhoneOut = Annotated[str, constr(regex=r"^\+\d{10,15}$")]
+PhoneIn = Annotated[str, Field(pattern=r"^\+?\d[\d\s\-()]{9,14}$")]
+PhoneOut = Annotated[str, Field(pattern=r"^\+\d{10,15}$")]
 
 
 class ResumeIn(BaseModel):
@@ -49,8 +46,8 @@ class ExperienceIn(BaseModel):
 
     company: str
     position: str
-    start_date: str
-    end_date: str | None = None
+    start_date: str  # Raw string input - will be converted to date
+    end_date: str | None = None  # Raw string input - will be converted to date
     description: list[str] = Field(default_factory=list)
     location: str | None = None
 
@@ -65,8 +62,8 @@ class EducationIn(BaseModel):
 
     school: str
     degree: str
-    start_date: str
-    graduation_date: str
+    start_date: str  # Raw string input - will be converted to date
+    graduation_date: str  # Raw string input - will be converted to date
     gpa: float | None = None
 
     model_config = {"extra": "forbid"}
@@ -96,30 +93,38 @@ class LocationIn(BaseModel):
 class ExperienceOut(BaseModel):
     """
     Cleaned version of an experience entry.
-    Dates should be parsed into a consistent format (e.g., YYYY-MM).
+    Dates are parsed into proper date objects for validation and formatting.
     Text fields should be whitespace-trimmed and standardized.
     """
 
     company: str
     position: str
-    start_date: str
-    end_date: str | None = None
+    start_date: date  # Clean date object - first day of month
+    end_date: date | None = None  # Clean date object - first day of month
     description: list[str] = Field(default_factory=list)
     location: str | None = None
+
+    @field_serializer("start_date", "end_date")
+    def _ym(self, v: date | None, _info):
+        return None if v is None else v.strftime("%Y-%m")
 
 
 class EducationOut(BaseModel):
     """
     Cleaned version of an education entry.
-    Graduation date should be standardized.
+    Graduation date is parsed into proper date object.
     GPA must fall between 0.0 and 4.0 if provided.
     """
 
     school: str
     degree: str
-    start_date: str
-    graduation_date: str | None
+    start_date: date  # Clean date object - first day of month
+    graduation_date: date | None  # Clean date object - first day of month
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
+
+    @field_serializer("start_date", "graduation_date")
+    def _ym(self, v: date | None, _info):
+        return None if v is None else v.strftime("%Y-%m")
 
 
 class LocationOut(BaseModel):

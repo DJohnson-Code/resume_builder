@@ -1,12 +1,16 @@
 from __future__ import annotations
+
 from typing import Optional, Iterable, List
-from datetime import datetime
+from datetime import datetime, date
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 from models import ResumeIn
 import re
 import pyap
 import unicodedata
+import phonenumbers
 from dateutil import parser
+from dateutil.parser import ParserError
+from phonenumbers.phonenumberutil import NumberParseException
 
 
 # =============================================================================
@@ -16,20 +20,7 @@ from dateutil import parser
 
 def clean_text(s: Optional[str]) -> Optional[str]:
     """
-    Base text cleaning function - removes whitespace, accents, and emoji.
-
-    This is the foundation for all other cleaning functions.
-
-    Args:
-        s: Raw text string (may be None)
-
-    Returns:
-        Cleaned text or None if input was empty/invalid
-
-    Examples:
-        "  John   Doe  " -> "John Doe"
-        "résumé" -> "resume"
-        "Hello 👋 World" -> "Hello World"
+    Remove extra whitespace, accents, and most emoji/supplementary symbols.
     """
     if s is None:
         return None
@@ -46,38 +37,29 @@ def clean_text(s: Optional[str]) -> Optional[str]:
 
 
 def title_case(s: Optional[str]) -> Optional[str]:
-    """
-    Convert text to title case after cleaning.
-
-    Args:
-        s: Raw text string
-
-    Returns:
-        Title-cased text or None if input was empty
-
-    Examples:
-        "john doe" -> "John Doe"
-        "MICROSOFT CORPORATION" -> "Microsoft Corporation"
-    """
+    """Clean then Title-Case a string."""
     t = clean_text(s)
     return t.title() if t else t
 
 
 def clean_email(email: str) -> str:
-    """
-    Clean and normalize email addresses.
-
-    Args:
-        email: Raw email string
-
-    Returns:
-        Lowercase email with whitespace removed
-
-    Examples:
-        "John.Doe@GMAIL.COM " -> "john.doe@gmail.com"
-    """
+    """Lowercase + strip spaces."""
     t = "".join(email.split())
     return t.lower() if t else t
+
+
+def to_e164(raw: str, default_region: str | None = None) -> str | None:
+    """
+    Convert phone number to E.164 using 'phonenumbers'.
+    Returns None if not parseable/valid.
+    """
+    try:
+        n = phonenumbers.parse(raw, default_region)
+        if phonenumbers.is_valid_number(n):
+            return phonenumbers.format_number(n, phonenumbers.PhoneNumberFormat.E164)
+        return None
+    except NumberParseException:
+        return None
 
 
 # =============================================================================
@@ -86,22 +68,8 @@ def clean_email(email: str) -> str:
 
 
 def resume_warnings(res_warn: ResumeIn) -> list[str]:
-    """
-    Generate non-critical warnings about missing resume sections.
-
-    These warnings help users understand what might be missing from their resume
-    but don't prevent the resume from being processed.
-
-    Args:
-        res_warn: ResumeIn object to check for missing sections
-
-    Returns:
-        List of warning messages
-
-    Examples:
-        ["No education entries provided.", "No links or portfolios provided."]
-    """
-    warnings = []
+    """Non-critical guidance about missing sections."""
+    warnings: list[str] = []
 
     if not res_warn.education:
         warnings.append("No education entries provided.")
@@ -123,25 +91,10 @@ def resume_warnings(res_warn: ResumeIn) -> list[str]:
 # =============================================================================
 
 
-def clean_date(date_cleaned: Optional[str]) -> Optional[str]:
+def clean_date(date_cleaned: Optional[str]) -> Optional[date]:
     """
-    Normalize various date formats to YYYY-MM format.
-
-    Handles flexible date inputs and converts them to consistent format.
-    Special values like "Present" return None (for ongoing positions).
-
-    Args:
-        date_cleaned: Raw date string in various formats
-
-    Returns:
-        Normalized date in YYYY-MM format or None for invalid/special dates
-
-    Examples:
-        "January 2023" -> "2023-01"
-        "01/2023" -> "2023-01"
-        "2023" -> "2023-01"
-        "Present" -> None
-        "Invalid date" -> None
+    Parse many date formats to a date object set to the first of the month.
+    Special values ('present', 'current', 'ongoing', 'now') => None.
     """
     if not date_cleaned:
         return None
@@ -150,13 +103,19 @@ def clean_date(date_cleaned: Optional[str]) -> Optional[str]:
     if not date_cleaned:
         return None
 
-    if date_cleaned.lower() in ["present", "current", "ongoing", "now"]:
+    if date_cleaned.lower() in ("present", "current", "ongoing", "now"):
         return None
 
     try:
-        date_obj = parser.parse(date_cleaned)
-        return date_obj.strftime("%Y-%m")
-    except Exception:
+        dt = parser.parse(
+            date_cleaned,
+            fuzzy=True,
+            dayfirst=False,
+            yearfirst=True,
+            default=datetime(2000, 1, 1),
+        )
+        return date(dt.year, dt.month, 1)  # force first of month
+    except (ParserError, ValueError):
         return None
 
 
@@ -167,21 +126,7 @@ def clean_date(date_cleaned: Optional[str]) -> Optional[str]:
 
 def clean_name(name: str) -> str:
     """
-    Clean and normalize person names.
-
-    Removes titles (Mr, Mrs, Dr, etc.) and applies proper capitalization.
-    Handles common name formatting issues.
-
-    Args:
-        name: Raw name string (may include titles)
-
-    Returns:
-        Cleaned name with proper capitalization
-
-    Examples:
-        "dr. john doe" -> "John Doe"
-        "MRS. JANE SMITH" -> "Jane Smith"
-        "professor mike johnson" -> "Mike Johnson"
+    Remove titles (Mr, Mrs, Dr, Prof) and proper-case the name.
     """
     if not name:
         return ""
@@ -190,7 +135,7 @@ def clean_name(name: str) -> str:
     if not cleaned:
         return ""
 
-    titles = ["mr", "mrs", "ms", "dr", "prof", "professor"]
+    titles = {"mr", "mrs", "ms", "dr", "prof", "professor"}
     words = cleaned.lower().split()
 
     # Remove titles from the beginning
@@ -206,21 +151,9 @@ def clean_name(name: str) -> str:
 
 def clean_location(location: str) -> str:
     """
-    Parse and format location using pyap address parsing.
-
-    Uses pyap library to extract city, state, country from raw location text.
-    Falls back to title case if parsing fails.
-
-    Args:
-        location: Raw location string (address, city/state, etc.)
-
-    Returns:
-        Formatted location string
-
-    Examples:
-        "123 Main St Houston Texas" -> "Houston, TX"
-        "London UK" -> "London, UK"
-        "just a city" -> "Just A City" (fallback)
+    Best-effort formatter from a free-form string.
+    Uses pyap for US addresses, else falls back to title case.
+    NOTE: This returns a string.
     """
     if not location:
         return ""
@@ -258,3 +191,8 @@ def clean_location(location: str) -> str:
     except Exception:
         # If pyap fails, fallback to title case
         return cleaned.title()
+
+
+# clean the urls
+
+# clean the skills, deduplicate
