@@ -243,3 +243,26 @@ def clean_urls(urls: list[str]) -> list[str]:
 
 
 # clean the skills, deduplicate
+def clean_skills(skills: list[str]) -> list[str]:
+    if not skills:
+        return []
+
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    
+    for skill in skills:
+        if not skill: 
+            continue
+        
+        skill = clean_text(skill)
+        if not skill: 
+            continue
+        
+        normalized = skill.lower()
+        if normalized in seen: 
+            continue
+        
+        seen.add(normalized)
+        cleaned.append(skill)
+        
+    return cleaned
