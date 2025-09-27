@@ -62,8 +62,8 @@ class EducationIn(BaseModel):
 
     school: str
     degree: str
-    start_date: str  # Raw string input - will be converted to date
-    graduation_date: str  # Raw string input - will be converted to date
+    start_date: date  # Raw string input - will be converted to date
+    graduation_date: date | None = None  # Raw string input - converted to date
     gpa: float | None = None
 
     model_config = {"extra": "forbid"}

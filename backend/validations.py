@@ -1,11 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional, Iterable, List
+from typing import Optional, List
 from datetime import datetime, date
-from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
-from models import ResumeIn
+from urllib.parse import urlparse, urlunparse
+from models import (
+    ResumeIn,
+    LocationIn,
+    LocationOut,
+    ExperienceIn,
+    ExperienceOut,
+    EducationIn,
+    EducationOut,
+)
 import re
-import pyap
 import unicodedata
 import phonenumbers
 from dateutil import parser
@@ -149,48 +156,24 @@ def clean_name(name: str) -> str:
     return " ".join(word.capitalize() for word in words)
 
 
-def clean_location(location: str) -> str:
+def clean_location(location: LocationIn | None) -> LocationOut | None:
     """
-    Best-effort formatter from a free-form string.
-    Uses pyap for US addresses, else falls back to title case.
-    NOTE: This returns a string.
+    Clean and format location data from LocationIn to LocationOut.
     """
     if not location:
-        return ""
+        return None
 
-    cleaned = clean_text(location)
-    if not cleaned:
-        return ""
+    # Clean each field
+    city = clean_text(location.city) or ""
+    state = clean_text(location.state) or ""
+    country = clean_text(location.country) or ""
+    zip_code = clean_text(location.zip) if location.zip else None
 
-    try:
-        # Parse the address using pyap
-        addresses = pyap.parse(cleaned, country="US")
+    # Return None if no meaningful location data
+    if not any([city, state, country]):
+        return None
 
-        if addresses:
-            addr = addresses[0]  # Take the first (most likely) address
-
-            # Extract components
-            city = addr.city or ""
-            state = addr.state or ""
-            country = addr.country or ""
-
-            # Format the result
-            if city and state:
-                return f"{city}, {state}"
-            elif city and country:
-                return f"{city}, {country}"
-            elif city:
-                return city
-            else:
-                # Fallback to title case
-                return cleaned.title()
-        else:
-            # No address found, fallback to title case
-            return cleaned.title()
-
-    except Exception:
-        # If pyap fails, fallback to title case
-        return cleaned.title()
+    return LocationOut(city=city, state=state, country=country, zip=zip_code)
 
 
 def normalize_url(u: str) -> str | None:
@@ -213,7 +196,9 @@ def normalize_url(u: str) -> str | None:
         return None
 
     p_norm = p._replace(
-        scheme=p.scheme.lower(), netloc=p.netloc.lower(), path=p.path.rstrip("/")
+        scheme=p.scheme.lower(),
+        netloc=p.netloc.lower(),
+        path=p.path.rstrip("/"),
     )
     return urlunparse(p_norm)
 
@@ -244,25 +229,67 @@ def clean_urls(urls: list[str]) -> list[str]:
 
 # clean the skills, deduplicate
 def clean_skills(skills: list[str]) -> list[str]:
-    if not skills:
-        return []
 
     cleaned: list[str] = []
     seen: set[str] = set()
-    
+
     for skill in skills:
-        if not skill: 
+        if not skill:
             continue
-        
+
         skill = clean_text(skill)
-        if not skill: 
+        if not skill:
             continue
-        
+
         normalized = skill.lower()
-        if normalized in seen: 
+        if normalized in seen:
             continue
-        
+
         seen.add(normalized)
         cleaned.append(skill)
-        
+
     return cleaned
+
+
+def _first_of_month(d: Optional[date]) -> Optional[date]:
+    if d is None:
+        return None
+    return date(d.year, d.month, 1)
+
+
+def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
+    if not items:
+        return []
+    out: List[EducationOut] = []
+
+    for education in items:  # use ed consistently
+        school = title_case(education.school) or ""
+        degree = title_case(education.degree) or ""
+
+        sd = _first_of_month(education.start_date)
+        gd = (
+            _first_of_month(education.graduation_date)
+            if education.graduation_date
+            else None
+        )
+
+        gpa = education.gpa
+        if gpa is not None:
+            try:
+                g = float(gpa)
+                gpa = g if 0.0 <= g <= 4.0 else None
+            except Exception:
+                gpa = None
+
+        if school and degree and sd:
+            out.append(
+                EducationOut(
+                    school=school,
+                    degree=degree,
+                    start_date=sd,
+                    graduation_date=gd,
+                    gpa=gpa,
+                )
+            )
+
+    return out
