@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from turtle import title
 from typing import Optional, List
 from datetime import datetime, date
 from urllib.parse import urlparse, urlunparse
@@ -251,7 +252,7 @@ def clean_skills(skills: list[str]) -> list[str]:
     return cleaned
 
 
-def _first_of_month(d: Optional[date]) -> Optional[date]:
+def first_of_month(d: Optional[date]) -> Optional[date]:
     if d is None:
         return None
     return date(d.year, d.month, 1)
@@ -266,9 +267,9 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
         school = title_case(education.school) or ""
         degree = title_case(education.degree) or ""
 
-        sd = _first_of_month(education.start_date)
+        sd = first_of_month(education.start_date)
         gd = (
-            _first_of_month(education.graduation_date)
+            first_of_month(education.graduation_date)
             if education.graduation_date
             else None
         )
@@ -293,3 +294,20 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
             )
 
     return out
+
+
+def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]:
+    if not items:
+        return []
+
+    out: List[ExperienceOut] = []
+
+    for experience in items:
+
+        company = title_case(items.company) or ""
+        position = title_case(experience.position) or ""
+
+        start_date = first_of_month(experience.start_date)
+        end_date = first_of_month(experience.end_date) if experience.end_date else None
+
+        description = title_case(experience.description)
