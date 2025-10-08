@@ -44,10 +44,10 @@ class ExperienceIn(BaseModel):
     Dates and text may be inconsistent or uncleaned.
     """
 
-    company: str
-    position: str
-    start_date: str  # Raw string input - will be converted to date
-    end_date: str | None = None  # Raw string input - will be converted to date
+    company: str = Field(min_length=1)
+    position: str = Field(min_length=1)
+    start_date: date  
+    end_date: date | None = None  
     description: list[str] = Field(default_factory=list)
     location: str | None = None
 

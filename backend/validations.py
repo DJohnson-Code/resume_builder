@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from fastapi import HTTPException
 from turtle import title
 from typing import Optional, List
 from datetime import datetime, date
@@ -304,10 +305,34 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
 
     for experience in items:
 
-        company = title_case(items.company) or ""
+        company = title_case(experience.company) or ""
         position = title_case(experience.position) or ""
 
         start_date = first_of_month(experience.start_date)
         end_date = first_of_month(experience.end_date) if experience.end_date else None
 
-        description = title_case(experience.description)
+        desc_raw = clean_text(experience.description or "")
+        description = [line for line in desc_raw.split("\n") if line.strip()]
+        
+        location = title_case(experience.location) or ""
+
+        # Only add if we have minimum required fields
+        if not company:
+            raise HTTPException(status_code=422, detail="Company required.")
+        if not position:
+            raise HTTPException(status_code=422, detail="Position required.")
+        if not start_date:
+            raise HTTPException(status_code=422, detail="Start date required.")
+        
+        out.append(
+            ExperienceOut(
+                company=company,
+                position=position,
+                start_date=start_date,
+                end_date=end_date,
+                description=description,
+                location=location,
+            )
+        )
+
+    return out
