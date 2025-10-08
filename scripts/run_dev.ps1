@@ -1,40 +1,42 @@
-# PowerShell script to run the development server
+# Run FastAPI dev server (PowerShell)
 # Usage: .\scripts\run_dev.ps1
+$ErrorActionPreference = 'Stop'
 
-Write-Host "Starting Resume Builder Development Server..." -ForegroundColor Green
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $RepoRoot
 
-# Check if .venv exists
 if (-not (Test-Path ".venv")) {
-    Write-Host "Error: .venv directory not found!" -ForegroundColor Red
-    Write-Host "Please create a virtual environment first:" -ForegroundColor Yellow
-    Write-Host "  python -m venv .venv" -ForegroundColor Yellow
-    Write-Host "  .venv\Scripts\Activate.ps1" -ForegroundColor Yellow
-    Write-Host "  pip install -r backend\requirements.txt" -ForegroundColor Yellow
+    Write-Host "   .venv not found. Create it and install deps:" -ForegroundColor Red
+    Write-Host "   python -m venv .venv"
+    Write-Host "   .\.venv\Scripts\Activate.ps1"
+    Write-Host "   python -m pip install -r backend\requirements.txt"
     exit 1
 }
 
-# Activate virtual environment
-Write-Host "Activating virtual environment..." -ForegroundColor Cyan
-& ".venv\Scripts\Activate.ps1"
+$Python = Join-Path $RepoRoot ".venv\Scripts\python.exe"
 
-# Check if uvicorn is installed
-try {
-    $uvicornCheck = & python -c "import uvicorn; print('uvicorn available')" 2>$null
-    if (-not $uvicornCheck) {
-        Write-Host "Installing uvicorn..." -ForegroundColor Yellow
-        pip install uvicorn[standard]
-    }
-} catch {
-    Write-Host "Installing uvicorn..." -ForegroundColor Yellow
-    pip install uvicorn[standard]
+try { & $Python -c "import uvicorn" 2>$null } catch {
+    Write-Host "Installing uvicorn[standard]..." -ForegroundColor Yellow
+    & $Python -m pip install --upgrade pip
+    & $Python -m pip install "uvicorn[standard]"
 }
 
-# Run the development server
-Write-Host "Starting FastAPI server with auto-reload..." -ForegroundColor Green
-Write-Host "Server will be available at: http://127.0.0.1:8000" -ForegroundColor Cyan
-Write-Host "API docs available at: http://127.0.0.1:8000/docs" -ForegroundColor Cyan
-Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
+# Load .env
+$envPath = Join-Path $RepoRoot ".env"
+if (Test-Path $envPath) {
+    Get-Content $envPath | ForEach-Object {
+        if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+        $parts = $_ -split '=', 2
+        if ($parts.Count -ne 2) { return }
+        $k = $parts[0].Trim(); $v = $parts[1].Trim()
+        if ($v.StartsWith('"') -and $v.EndsWith('"')) { $v = $v.Substring(1, $v.Length - 2) }
+        if ($v.StartsWith("'") -and $v.EndsWith("'")) { $v = $v.Substring(1, $v.Length - 2) }
+        if ($k) { Set-Item -Path ("Env:{0}" -f $k) -Value $v }
+    }
+}
 
-# Change to backend directory and run uvicorn
-Set-Location backend
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
+$apiHost = if ($env:API_HOST) { $env:API_HOST } else { "127.0.0.1" }
+$apiPort = if ($env:API_PORT) { $env:API_PORT } else { "8000" }
+
+Write-Host "Starting FastAPI (http://$apiHost`:$apiPort, docs: /docs) ..." -ForegroundColor Green
+& $Python -m uvicorn backend.main:app --reload --host $apiHost --port $apiPort
