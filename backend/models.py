@@ -32,9 +32,25 @@ class ResumeIn(BaseModel):
     experience: list[ExperienceIn] | None = None
     skills: Annotated[list[str], Field(min_length=1)]  # At least 1 skill
     education: list[EducationIn] | None = None
-    certifications: list[str] | None = None
+    certifications: list[CertificationIn] | None = None
 
     # Security: reject any unexpected fields from user input
+    model_config = {"extra": "forbid"}
+
+
+class CertificationIn(BaseModel):
+    """
+    Raw certification data from user input.
+    Dates and text may be inconsistent or uncleaned.
+    """
+
+    name: str = Field(min_length=1)
+    issuer: str = Field(min_length=1)
+    issue_date: date
+    expiry_date: date | None = None
+    credential_id: str | None = None
+    verification_url: str | None = None
+
     model_config = {"extra": "forbid"}
 
 
@@ -46,8 +62,8 @@ class ExperienceIn(BaseModel):
 
     company: str = Field(min_length=1)
     position: str = Field(min_length=1)
-    start_date: date  
-    end_date: date | None = None  
+    start_date: date
+    end_date: date | None = None
     description: list[str] = Field(default_factory=list)
     location: str | None = None
 
@@ -90,6 +106,25 @@ class LocationIn(BaseModel):
 # No extra field restrictions (allows AI to add fields)
 
 
+class CertificationOut(BaseModel):
+    """
+    Cleaned version of a certification entry.
+    Dates are parsed into proper date objects for validation and formatting.
+    Text fields should be whitespace-trimmed and standardized.
+    """
+
+    name: str
+    issuer: str
+    issue_date: date
+    expiry_date: date | None = None
+    credential_id: str | None = None
+    verification_url: str | None = None
+
+    @field_serializer("issue_date", "expiry_date")
+    def _ym(self, v: date | None, _info):
+        return None if v is None else v.strftime("%Y-%m")
+
+
 class ExperienceOut(BaseModel):
     """
     Cleaned version of an experience entry.
@@ -119,7 +154,7 @@ class EducationOut(BaseModel):
     school: str
     degree: str
     start_date: date  # Clean date object - first day of month
-    graduation_date: date | None  # Clean date object - first day of month
+    graduation_date: date | None = None  # Clean date object - first day of month
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
     @field_serializer("start_date", "graduation_date")

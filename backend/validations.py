@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from fastapi import HTTPException
-from turtle import title
 from typing import Optional, List
 from datetime import datetime, date
 from urllib.parse import urlparse, urlunparse
@@ -13,6 +12,8 @@ from models import (
     ExperienceOut,
     EducationIn,
     EducationOut,
+    CertificationIn,
+    CertificationOut,
 )
 import re
 import unicodedata
@@ -313,7 +314,7 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
 
         desc_raw = clean_text(experience.description or "")
         description = [line for line in desc_raw.split("\n") if line.strip()]
-        
+
         location = title_case(experience.location) or ""
 
         # Only add if we have minimum required fields
@@ -323,7 +324,7 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
             raise HTTPException(status_code=422, detail="Position required.")
         if not start_date:
             raise HTTPException(status_code=422, detail="Start date required.")
-        
+
         out.append(
             ExperienceOut(
                 company=company,
@@ -332,6 +333,49 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
                 end_date=end_date,
                 description=description,
                 location=location,
+            )
+        )
+
+    return out
+
+
+def clean_certifications(
+    items: Optional[List[CertificationIn]],
+) -> List[CertificationOut]:
+    """Clean and validate certification data."""
+    if not items:
+        return []
+
+    out: List[CertificationOut] = []
+
+    for cert in items:
+        name = clean_text(cert.name) or ""
+        issuer = clean_text(cert.issuer) or ""
+        credential_id = clean_text(cert.credential_id) if cert.credential_id else None
+        verification_url = (
+            clean_text(cert.verification_url) if cert.verification_url else None
+        )
+
+        # Validate required fields
+        if not name:
+            raise HTTPException(status_code=422, detail="Certification name required.")
+        if not issuer:
+            raise HTTPException(
+                status_code=422, detail="Certification issuer required."
+            )
+        if not cert.issue_date:
+            raise HTTPException(
+                status_code=422, detail="Certification issue date required."
+            )
+
+        out.append(
+            CertificationOut(
+                name=name,
+                issuer=issuer,
+                issue_date=cert.issue_date,
+                expiry_date=cert.expiry_date,
+                credential_id=credential_id,
+                verification_url=verification_url,
             )
         )
 
