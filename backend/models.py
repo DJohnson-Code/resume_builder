@@ -214,7 +214,7 @@ class ResumeOut(BaseModel):
         default_factory=list
     )  # Cleaned education
 
-    cleaned_certifications: list[str] = Field(
+    cleaned_certifications: list[CertificationOut] = Field(
         default_factory=list
     )  # Deduplicated certifications
 
