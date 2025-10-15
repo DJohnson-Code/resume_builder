@@ -276,14 +276,6 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
             else None
         )
 
-        gpa = education.gpa
-        if gpa is not None:
-            try:
-                g = float(gpa)
-                gpa = g if 0.0 <= g <= 4.0 else None
-            except Exception:
-                gpa = None
-
         if school and degree and sd:
             out.append(
                 EducationOut(
@@ -291,7 +283,7 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
                     degree=degree,
                     start_date=sd,
                     graduation_date=gd,
-                    gpa=gpa,
+                    gpa=education.gpa,
                 )
             )
 

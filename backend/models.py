@@ -9,7 +9,7 @@ PhoneOut = Annotated[str, Field(pattern=r"^\+\d{10,15}$")]
 
 class ResumeIn(BaseModel):
     """
-    Raw resume data from user input - accepts messy, inconsistent formats.
+    Raw resume data from the user, the input may be messy initially
 
     This is the entry point for user data. Fields may contain:
     - Inconsistent date formats ("Jan 2023", "01/2023", "2023-01")
@@ -18,7 +18,7 @@ class ResumeIn(BaseModel):
     - Unformatted location data
 
     All fields will be cleaned and normalized by validation functions
-    before being converted to ResumeOut.
+    before being converted to the ResumeOut Model.
     """
 
     # Basic contact information (using type hints - variable_name: data_type)
@@ -40,13 +40,13 @@ class ResumeIn(BaseModel):
 
 class CertificationIn(BaseModel):
     """
-    Raw certification data from user input.
-    Dates and text may be inconsistent or uncleaned.
+    Raw certification data from the user
+    Dates and text may be inconsistent or not enetered correctly.
     """
 
-    name: str = Field(min_length=1)
-    issuer: str = Field(min_length=1)
-    issue_date: date
+    name: Annotated[str, Field(min_length=1)]
+    issuer: Annotated[str, Field(min_length=1)]
+    issue_date: date # Raw string input - will be converted to date
     expiry_date: date | None = None
     credential_id: str | None = None
     verification_url: str | None = None
@@ -56,15 +56,15 @@ class CertificationIn(BaseModel):
 
 class ExperienceIn(BaseModel):
     """
-    Raw experience entry as provided in the resume input.
-    Dates and text may be inconsistent or uncleaned.
+    Raw experience entry as it is provided by the user.
+    Dates and text may be inconsistent or not entered correctly. 
     """
 
-    company: str = Field(min_length=1)
-    position: str = Field(min_length=1)
+    company: Annotated[str, Field(min_length=1)]
+    position: Annotated[list[str], Field(min_length=1)]
     start_date: date
     end_date: date | None = None
-    description: list[str] = Field(default_factory=list)
+    description: Annotated[list[str], Field(default_factory=list)]
     location: str | None = None
 
     model_config = {"extra": "forbid"}
@@ -72,23 +72,23 @@ class ExperienceIn(BaseModel):
 
 class EducationIn(BaseModel):
     """
-    Raw education entry as provided in the resume input.
-    Graduation dates and GPA may need validation/cleaning.
+    Raw education entry as provided in the resume input by the user.
+    Graduation dates and GPA may need validation
     """
 
     school: str
     degree: str
-    start_date: date  # Raw string input - will be converted to date
-    graduation_date: date | None = None  # Raw string input - converted to date
-    gpa: float | None = None
+    start_date: date
+    graduation_date: date | None = None
+    gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
     model_config = {"extra": "forbid"}
 
 
 class LocationIn(BaseModel):
     """
-    Raw location data from user input.
-    Fields may be inconsistent or unclean.
+    Raw location data from user input
+    Fields may be inconsistent
     """
 
     city: str
@@ -110,7 +110,7 @@ class CertificationOut(BaseModel):
     """
     Cleaned version of a certification entry.
     Dates are parsed into proper date objects for validation and formatting.
-    Text fields should be whitespace-trimmed and standardized.
+    Text fields should have excess whitespace trimmed.
     """
 
     name: str
@@ -154,7 +154,7 @@ class EducationOut(BaseModel):
     school: str
     degree: str
     start_date: date  # Clean date object - first day of month
-    graduation_date: date | None = None  # Clean date object - first day of month
+    graduation_date: date | None = None  # Clean date object - first day month
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
     @field_serializer("start_date", "graduation_date")
