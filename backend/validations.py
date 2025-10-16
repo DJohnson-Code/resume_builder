@@ -59,7 +59,7 @@ def clean_email(email: str) -> str:
 
 
 def invalid_phone(detail: str = "Invalid phone number."):
-    raise HTTPException(status=422, detail=detail)
+    raise HTTPException(status_code=422, detail=detail)
 
 
 def to_e164(raw: str, region_default: str = "US") -> str:
@@ -71,7 +71,7 @@ def to_e164(raw: str, region_default: str = "US") -> str:
     """
     s = (raw or "").strip()
     if not s:
-        print(invalid_phone())
+        invalid_phone("Phone number is required")
     try:
         # If user provided international format, don't force a region hint
         region = None if s.startswith("+") else region_default
