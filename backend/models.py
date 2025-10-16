@@ -133,7 +133,7 @@ class ExperienceOut(BaseModel):
     """
 
     company: str
-    position: str
+    position: Annotated[list[str], Field(min_length=1)]
     start_date: date  # Clean date object - first day of month
     end_date: date | None = None  # Clean date object - first day of month
     description: list[str] = Field(default_factory=list)

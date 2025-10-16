@@ -76,15 +76,12 @@ def to_e164(raw: str, region_default: str = "US") -> str:
         # If user provided international format, don't force a region hint
         region = None if s.startswith("+") else region_default
         num = phonenumbers.parse(s, region)
-        if (
-            not phonenumbers.is_possible_number(num)
-            or not phonenumbers.is_valid_number(num)
+        if not phonenumbers.is_possible_number(num) or not phonenumbers.is_valid_number(
+            num
         ):
             invalid_phone("Invalid phone number format")
-        return phonenumbers.format_number(
-            num, phonenumbers.PhoneNumberFormat.E164
-        )
-    except Exception:
+        return phonenumbers.format_number(num, phonenumbers.PhoneNumberFormat.E164)
+    except phonenumbers.NumberParseException:
         invalid_phone("Invalid phone number format")
 
 
@@ -313,33 +310,57 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
     out: List[ExperienceOut] = []
 
     for experience in items:
-
         company = title_case(experience.company) or ""
-        position = title_case(experience.position) or ""
+
+        # Process position as a list - clean each item, remove duplicates and blanks
+        if isinstance(experience.position, list):
+            positions = []
+            seen = set()
+            for pos in experience.position:
+                cleaned_pos = title_case(pos)
+                if cleaned_pos and cleaned_pos.lower() not in seen:
+                    seen.add(cleaned_pos.lower())
+                    positions.append(cleaned_pos)
+        else:
+            # Handle legacy string position
+            cleaned_pos = title_case(experience.position)
+            positions = [cleaned_pos] if cleaned_pos else []
+
+        # Process description as a list - clean each item, remove duplicates and blanks
+        if isinstance(experience.description, list):
+            descriptions = []
+            seen = set()
+            for desc in experience.description:
+                cleaned_desc = clean_text(desc)
+                if cleaned_desc and cleaned_desc.lower() not in seen:
+                    seen.add(cleaned_desc.lower())
+                    descriptions.append(cleaned_desc)
+        else:
+            # Handle legacy string description
+            desc_raw = clean_text(experience.description or "")
+            descriptions = [line for line in desc_raw.split("\n") if line.strip()]
 
         start_date = first_of_month(experience.start_date)
         end_date = first_of_month(experience.end_date) if experience.end_date else None
-
-        desc_raw = clean_text(experience.description or "")
-        description = [line for line in desc_raw.split("\n") if line.strip()]
-
         location = title_case(experience.location) or ""
 
         # Only add if we have minimum required fields
         if not company:
             raise HTTPException(status_code=422, detail="Company required.")
-        if not position:
-            raise HTTPException(status_code=422, detail="Position required.")
+        if not positions:
+            raise HTTPException(
+                status_code=422, detail="At least one position required."
+            )
         if not start_date:
             raise HTTPException(status_code=422, detail="Start date required.")
 
         out.append(
             ExperienceOut(
                 company=company,
-                position=position,
+                position=positions,
                 start_date=start_date,
                 end_date=end_date,
-                description=description,
+                description=descriptions,
                 location=location,
             )
         )

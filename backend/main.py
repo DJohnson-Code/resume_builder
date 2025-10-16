@@ -64,10 +64,6 @@ def validate_resume(payload: ResumeIn):
 
     # Ensure phone is in E.164 format or None
     cleaned_phone = to_e164(payload.phone)
-    if not cleaned_phone:
-        # If phone can't be parsed, we need to handle this gracefully
-        # For now, we'll use the original phone but this should be improved
-        cleaned_phone = payload.phone
 
     # Clean all sections
     cleaned_location = clean_location(payload.location)
