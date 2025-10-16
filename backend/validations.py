@@ -58,18 +58,34 @@ def clean_email(email: str) -> str:
     return t.lower() if t else t
 
 
-def to_e164(raw: str, default_region: str | None = None) -> str | None:
+def invalid_phone(detail: str = "Invalid phone number."):
+    raise HTTPException(status=422, detail=detail)
+
+
+def to_e164(raw: str, region_default: str = "US") -> str:
     """
-    Convert phone number to E.164 using 'phonenumbers'.
-    Returns None if not parseable/valid.
+    Convert raw phone to strict E.164.
+    - If input starts with '+', parse without region hint
+    - Else parse with region_default (e.g., 'US')
+    - On any failure, raise HTTP 422
     """
+    s = (raw or "").strip()
+    if not s:
+        print(invalid_phone())
     try:
-        n = phonenumbers.parse(raw, default_region)
-        if phonenumbers.is_valid_number(n):
-            return phonenumbers.format_number(n, PhoneNumberFormat.E164)
-        return None
-    except NumberParseException:
-        return None
+        # If user provided international format, don't force a region hint
+        region = None if s.startswith("+") else region_default
+        num = phonenumbers.parse(s, region)
+        if (
+            not phonenumbers.is_possible_number(num)
+            or not phonenumbers.is_valid_number(num)
+        ):
+            invalid_phone("Invalid phone number format")
+        return phonenumbers.format_number(
+            num, phonenumbers.PhoneNumberFormat.E164
+        )
+    except Exception:
+        invalid_phone("Invalid phone number format")
 
 
 # =============================================================================
