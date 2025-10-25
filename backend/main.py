@@ -29,7 +29,7 @@ def health():
 
 
 @app.post("/api/resume/validate", response_model=ResumeOut)
-def validate_resume(payload: ResumeIn): 
+def validate_resume(payload: ResumeIn):
     """
     Validate and clean a resume payload.
 

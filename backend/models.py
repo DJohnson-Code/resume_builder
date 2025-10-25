@@ -3,8 +3,16 @@ from typing import Annotated
 from datetime import date
 from pydantic import BaseModel, EmailStr, HttpUrl, Field, field_serializer
 
-PhoneIn = Annotated[str, Field(pattern=r"^\+?\d[\d\s\-()]{9,14}$")]
-PhoneOut = Annotated[str, Field(pattern=r"^\+\d{10,15}$")]
+PhoneIn = Annotated[
+    str,
+    Field(
+        pattern=r"^\+?\d[\d\s\-()]{9,14}$",
+        description="Phone number in various formats",
+    ),
+]
+PhoneOut = Annotated[
+    str, Field(pattern=r"^\+\d{10,15}$", description="Phone number in E.164 format")
+]
 
 
 class ResumeIn(BaseModel):
@@ -21,14 +29,13 @@ class ResumeIn(BaseModel):
     before being converted to the ResumeOut Model.
     """
 
-    # Basic contact information (using type hints - variable_name: data_type)
-    name: str
+    name: Annotated[str, Field(min_length=1)]
     email: EmailStr
     phone: PhoneIn
     location: LocationIn | None = None
 
     # Professional information (using type hints - variable_name: data_type)
-    urls: list[HttpUrl] | None = None  #
+    urls: list[HttpUrl] | None = None
     experience: list[ExperienceIn] | None = None
     skills: Annotated[list[str], Field(min_length=1)]  # At least 1 skill
     education: list[EducationIn] | None = None
@@ -41,12 +48,12 @@ class ResumeIn(BaseModel):
 class CertificationIn(BaseModel):
     """
     Raw certification data from the user
-    Dates and text may be inconsistent or not enetered correctly.
+    Dates and text may be inconsistent or not entered correctly.
     """
 
     name: Annotated[str, Field(min_length=1)]
     issuer: Annotated[str, Field(min_length=1)]
-    issue_date: date # Raw string input - will be converted to date
+    issue_date: date
     expiry_date: date | None = None
     credential_id: str | None = None
     verification_url: str | None = None
@@ -57,14 +64,14 @@ class CertificationIn(BaseModel):
 class ExperienceIn(BaseModel):
     """
     Raw experience entry as it is provided by the user.
-    Dates and text may be inconsistent or not entered correctly. 
+    Dates and text may be inconsistent or not entered correctly.
     """
 
     company: Annotated[str, Field(min_length=1)]
     position: Annotated[list[str], Field(min_length=1)]
     start_date: date
     end_date: date | None = None
-    description: Annotated[list[str], Field(default_factory=list)]
+    description: Annotated[list[str], Field(default_factory=list, min_length=1)]
     location: str | None = None
 
     model_config = {"extra": "forbid"}
@@ -76,8 +83,8 @@ class EducationIn(BaseModel):
     Graduation dates and GPA may need validation
     """
 
-    school: str
-    degree: str
+    school: Annotated[str, Field(min_length=1)]
+    degree: Annotated[str, Field(min_length=1)]
     start_date: date
     graduation_date: date | None = None
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
@@ -91,8 +98,8 @@ class LocationIn(BaseModel):
     Fields may be inconsistent
     """
 
-    city: str
-    state: str
+    city: Annotated[str, Field(min_length=1)]
+    state: Annotated[str, Field(min_length=1)]
     country: str
     zip: str | None = None
 

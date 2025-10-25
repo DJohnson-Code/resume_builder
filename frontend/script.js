@@ -93,12 +93,13 @@ function removeItem(button) {
   }, 300);
 }
 
-document.getElementById("resumeForm").addEventListener("submit", function (e) {
+document.getElementById("resumeForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const formData = new FormData(this);
   const resumeData = {};
 
+  // Parse form data
   for (let [key, value] of formData.entries()) {
     if (key.includes("[")) {
       const match = key.match(/(\w+)\[(\d+)\]\[(\w+)\]/);
@@ -113,20 +114,133 @@ document.getElementById("resumeForm").addEventListener("submit", function (e) {
     }
   }
 
+  // Transform frontend data to match backend API format
+  const apiPayload = transformToApiFormat(resumeData);
+
   const button = document.querySelector(".generate-button");
   const originalText = button.innerHTML;
   button.innerHTML = "⏳ Generating Your AI-Powered Resume...";
   button.disabled = true;
 
-  setTimeout(() => {
-    console.log("Resume data collected:", resumeData);
-    alert(
-      "Resume data collected! In a real implementation, this would be sent to your Python backend for AI processing and resume generation."
-    );
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/resume/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(apiPayload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Failed to validate resume");
+    }
+
+    const result = await response.json();
+    console.log("Resume validated successfully:", result);
+    
+    // Show success message with warnings if any
+    let message = "✅ Resume validated successfully!";
+    if (result.warnings && result.warnings.length > 0) {
+      message += "\n\n⚠️ Warnings:\n" + result.warnings.join("\n");
+    }
+    alert(message);
+
+  } catch (error) {
+    console.error("Error:", error);
+    alert("❌ Error validating resume: " + error.message);
+  } finally {
     button.innerHTML = originalText;
     button.disabled = false;
-  }, 2000);
+  }
 });
+
+// Transform frontend form data to match backend API format
+function transformToApiFormat(data) {
+  const payload = {
+    name: `${data.firstName || ""} ${data.lastName || ""}`.trim(),
+    email: data.email || "",
+    phone: data.phone || "",
+    skills: [],
+    urls: [],
+    experience: [],
+    education: [],
+    certifications: []
+  };
+
+  // Add location if provided
+  if (data.location) {
+    const locationParts = data.location.split(",").map(part => part.trim());
+    payload.location = {
+      city: locationParts[0] || "",
+      state: locationParts[1] || "",
+      country: "US", // Default to US
+      zip: ""
+    };
+  }
+
+  // Add URLs
+  if (data.linkedin) payload.urls.push(data.linkedin);
+
+  // Process skills
+  if (data.technicalSkills) {
+    payload.skills.push(...data.technicalSkills.split(",").map(s => s.trim()).filter(s => s));
+  }
+  if (data.softSkills) {
+    payload.skills.push(...data.softSkills.split(",").map(s => s.trim()).filter(s => s));
+  }
+
+  // Process education
+  if (data.education) {
+    for (const edu of data.education) {
+      if (edu.degree && edu.institution) {
+        payload.education.push({
+          school: edu.institution,
+          degree: edu.degree,
+          start_date: "2020-01-01", // Default start date
+          graduation_date: edu.year ? `${edu.year}-01-01` : null,
+          gpa: edu.gpa ? parseFloat(edu.gpa) : null
+        });
+      }
+    }
+  }
+
+  // Process experience
+  if (data.experience) {
+    for (const exp of data.experience) {
+      if (exp.title && exp.company) {
+        payload.experience.push({
+          company: exp.company,
+          position: [exp.title],
+          start_date: exp.startDate ? parseDate(exp.startDate) : "2020-01-01",
+          end_date: exp.endDate && exp.endDate.toLowerCase() !== "present" ? parseDate(exp.endDate) : null,
+          description: exp.description ? [exp.description] : [],
+          location: ""
+        });
+      }
+    }
+  }
+
+  return payload;
+}
+
+// Simple date parser for MM/YYYY format
+function parseDate(dateStr) {
+  if (!dateStr) return "2020-01-01";
+  
+  // Handle MM/YYYY format
+  if (dateStr.includes("/")) {
+    const [month, year] = dateStr.split("/");
+    return `${year}-${month.padStart(2, "0")}-01`;
+  }
+  
+  // Handle YYYY format
+  if (dateStr.match(/^\d{4}$/)) {
+    return `${dateStr}-01-01`;
+  }
+  
+  return "2020-01-01";
+}
 
 document.querySelectorAll(".form-section").forEach((section, index) => {
   section.style.animationDelay = `${index * 0.1}s`;
