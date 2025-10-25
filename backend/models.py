@@ -45,36 +45,68 @@ class ResumeIn(BaseModel):
     model_config = {"extra": "forbid"}
 
 
-class CertificationIn(BaseModel):
+class CertificationBase(BaseModel):
     """
-    Raw certification data from the user
-    Dates and text may be inconsistent or not entered correctly.
+    Parent/Base certification class.
+    Inherited by In and Out models.
     """
 
-    name: Annotated[str, Field(min_length=1)]
-    issuer: Annotated[str, Field(min_length=1)]
-    issue_date: date
+    name: str = Field(min_length=1)
+    issuer: str = Field(min_length=1)
+    issue_date: date | None = None
     expiry_date: date | None = None
     credential_id: str | None = None
     verification_url: str | None = None
 
+
+class CertificationIn(CertificationBase):
     model_config = {"extra": "forbid"}
 
 
-class ExperienceIn(BaseModel):
+class CertificationOut(CertificationBase):
+    """Clean, validated certification data ready for output or AI processing."""
+
+    issue_date: date
+    expiry_date: date | None = None
+    verification_url: HttpUrl | None = None  # Enforce valid http/https URL
+
+    @field_serializer("issue_date", "expiry_date")
+    def _ym(self, v: date | None, _info) -> str | None:
+        return None if v is None else v.strftime("%Y-%m")
+
+
+class ExperienceBase(BaseModel):
+
+    company: str = Field(min_length=1)
+    position: list[str] = Field(min_length=1)
+    start_date: date
+    end_date: date | None = None
+    description: list[str] = Field(default_factory=list)
+    location: str | None = None
+
+
+class ExperienceIn(ExperienceBase):
     """
     Raw experience entry as it is provided by the user.
     Dates and text may be inconsistent or not entered correctly.
     """
 
-    company: Annotated[str, Field(min_length=1)]
-    position: Annotated[list[str], Field(min_length=1)]
-    start_date: date
-    end_date: date | None = None
-    description: Annotated[list[str], Field(default_factory=list, min_length=1)]
-    location: str | None = None
-
     model_config = {"extra": "forbid"}
+
+
+class ExperienceOut(ExperienceBase):
+    """
+    Cleaned version of an experience entry.
+    Dates are parsed into proper date objects for validation and formatting.
+    Text fields should be whitespace-trimmed and standardized.
+    """
+
+    start_date: date  # Clean date object - first day of month
+    end_date: date | None = None  # Clean date object - first day of month
+
+    @field_serializer("start_date", "end_date")
+    def _ym(self, v: date | None, _info):
+        return None if v is None else v.strftime("%Y-%m")
 
 
 class EducationIn(BaseModel):
@@ -85,7 +117,7 @@ class EducationIn(BaseModel):
 
     school: Annotated[str, Field(min_length=1)]
     degree: Annotated[str, Field(min_length=1)]
-    start_date: date
+    start_date: date | None = None
     graduation_date: date | None = None
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
@@ -100,7 +132,7 @@ class LocationIn(BaseModel):
 
     city: Annotated[str, Field(min_length=1)]
     state: Annotated[str, Field(min_length=1)]
-    country: str
+    country: str | None = None
     zip: str | None = None
 
     model_config = {"extra": "forbid"}
@@ -111,44 +143,6 @@ class LocationIn(BaseModel):
 # =============================================================================
 # These models represent data after validation and cleaning
 # No extra field restrictions (allows AI to add fields)
-
-
-class CertificationOut(BaseModel):
-    """
-    Cleaned version of a certification entry.
-    Dates are parsed into proper date objects for validation and formatting.
-    Text fields should have excess whitespace trimmed.
-    """
-
-    name: str
-    issuer: str
-    issue_date: date
-    expiry_date: date | None = None
-    credential_id: str | None = None
-    verification_url: str | None = None
-
-    @field_serializer("issue_date", "expiry_date")
-    def _ym(self, v: date | None, _info):
-        return None if v is None else v.strftime("%Y-%m")
-
-
-class ExperienceOut(BaseModel):
-    """
-    Cleaned version of an experience entry.
-    Dates are parsed into proper date objects for validation and formatting.
-    Text fields should be whitespace-trimmed and standardized.
-    """
-
-    company: str
-    position: Annotated[list[str], Field(min_length=1)]
-    start_date: date  # Clean date object - first day of month
-    end_date: date | None = None  # Clean date object - first day of month
-    description: list[str] = Field(default_factory=list)
-    location: str | None = None
-
-    @field_serializer("start_date", "end_date")
-    def _ym(self, v: date | None, _info):
-        return None if v is None else v.strftime("%Y-%m")
 
 
 class EducationOut(BaseModel):
@@ -228,4 +222,8 @@ class ResumeOut(BaseModel):
     # Non-critical issues found during validation
     warnings: list[str] = Field(
         default_factory=list
-    )  # e.g., "No education provided", "Unparseable date"
+    )  # e.g. "No education provided", "Unparseable date"
+
+
+ResumeIn.model_rebuild()
+ResumeOut.model_rebuild()
