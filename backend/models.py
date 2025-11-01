@@ -76,6 +76,10 @@ class CertificationOut(CertificationBase):
 
 
 class ExperienceBase(BaseModel):
+    """
+    Base class for experience entries.
+    Inherited by In and Out models.
+    """
 
     company: str = Field(min_length=1)
     position: list[str] = Field(min_length=1)
@@ -105,11 +109,11 @@ class ExperienceOut(ExperienceBase):
     end_date: date | None = None  # Clean date object - first day of month
 
     @field_serializer("start_date", "end_date")
-    def _ym(self, v: date | None, _info):
+    def _ym(self, v: date | None, _info) -> str | None:
         return None if v is None else v.strftime("%Y-%m")
 
 
-class EducationIn(BaseModel):
+class EducationBase(BaseModel):
     """
     Raw education entry as provided in the resume input by the user.
     Graduation dates and GPA may need validation
@@ -117,25 +121,45 @@ class EducationIn(BaseModel):
 
     school: Annotated[str, Field(min_length=1)]
     degree: Annotated[str, Field(min_length=1)]
-    start_date: date | None = None
+    start_date: date | None = None  # Optional in input
     graduation_date: date | None = None
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 
+
+class EducationIn(EducationBase):
     model_config = {"extra": "forbid"}
 
 
-class LocationIn(BaseModel):
+class EducationOut(EducationBase):
+    start_date: date # Clean date object - first day of month
+    graduation_date: date | None = None  # Clean date object - first day of month
+
+    @field_serializer("start_date", "graduation_date")
+    def _ym(self, v: date | None, _info) -> str | None:
+        return None if v is None else v.strftime("%Y-%m")
+
+
+class LocationBase(BaseModel):
     """
     Raw location data from user input
     Fields may be inconsistent
     """
 
-    city: Annotated[str, Field(min_length=1)]
+    country: Annotated[str, Field(min_length=1)]
     state: Annotated[str, Field(min_length=1)]
-    country: str | None = None
+    city: Annotated[str, Field(min_length=1)]
     zip: str | None = None
 
+
+class LocationIn(LocationBase):
     model_config = {"extra": "forbid"}
+
+
+class LocationOut(LocationBase):
+    """
+    Cleaned location data.
+    All fields should be properly formatted and standardized.
+    """
 
 
 # =============================================================================
@@ -144,35 +168,6 @@ class LocationIn(BaseModel):
 # These models represent data after validation and cleaning
 # No extra field restrictions (allows AI to add fields)
 
-
-class EducationOut(BaseModel):
-    """
-    Cleaned version of an education entry.
-    Graduation date is parsed into proper date object.
-    GPA must fall between 0.0 and 4.0 if provided.
-    """
-
-    school: str
-    degree: str
-    start_date: date  # Clean date object - first day of month
-    graduation_date: date | None = None  # Clean date object - first day month
-    gpa: float | None = Field(default=None, ge=0.0, le=4.0)
-
-    @field_serializer("start_date", "graduation_date")
-    def _ym(self, v: date | None, _info):
-        return None if v is None else v.strftime("%Y-%m")
-
-
-class LocationOut(BaseModel):
-    """
-    Cleaned location data.
-    All fields should be properly formatted and standardized.
-    """
-
-    city: str
-    state: str
-    country: str
-    zip: str | None = None
 
 
 class ResumeOut(BaseModel):
