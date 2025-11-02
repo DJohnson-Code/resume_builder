@@ -1,0 +1,35 @@
+[project]
+name = "resume-builder"
+version = "0.1.0"
+description = "FastAPI backend for automated resume building and management"
+authors = [
+    {name = "Darnell Johnson",email = "darnellharrisjohnson@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "fastapi (==0.115.0)",
+    "uvicorn[standard] (==0.30.6)",
+    "python-dotenv (==1.0.1)",
+    "pydantic (==2.9.0)",
+    "python-dateutil (==2.9.0)",
+    "pyap (==0.3.1)",
+    "email-validator (==2.2.0)",
+    "phonenumbers (==8.13.27)"
+]
+
+[dependency-groups]
+dev = [
+    "black (>=25.9.0,<26.0.0)",
+    "ruff (>=0.14.3,<0.15.0)",
+    "mypy (>=1.18.2,<2.0.0)",
+    "pytest (>=8.4.2,<9.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "pytest-asyncio (>=1.2.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
