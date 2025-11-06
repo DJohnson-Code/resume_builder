@@ -9,9 +9,9 @@ class LocationBase(BaseModel):
     Fields may be inconsistent
     """
 
-    country: Annotated[str, Field(min_length=1)]
-    state: Annotated[str, Field(min_length=1)]
-    city: Annotated[str, Field(min_length=1)]
+    country: str = Field(min_length=1)
+    state: str | None = None
+    city: str | None = None
     zip: str | None = None
 
 

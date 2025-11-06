@@ -11,15 +11,17 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
     out: List[EducationOut] = []
 
     for education in items:
-        school = title_case(education.school)
+        school = title_case(education.school) or ""
         degree = title_case(education.degree) if education.degree else None
 
-        sd = first_of_month(education.start_date)
+        sd = first_of_month(education.start_date) if education.start_date else None
         gd = (
             first_of_month(education.graduation_date)
             if education.graduation_date
             else None
         )
+
+        gpa = education.gpa if education.gpa else None
 
         if school and sd:
             out.append(
@@ -28,7 +30,7 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
                     degree=degree,
                     start_date=sd,
                     graduation_date=gd,
-                    gpa=education.gpa,
+                    gpa=gpa,
                 )
             )
 

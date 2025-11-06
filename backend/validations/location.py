@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from models import LocationIn, LocationOut
+from typing import List
 from .utils import clean_text
 
 
@@ -10,16 +11,19 @@ def clean_location(location: LocationIn | None) -> LocationOut | None:
     """
     if not location:
         return None
+    
 
     # Clean each field
-    city = clean_text(location.city) or ""
-    state = clean_text(location.state) or ""
     country = clean_text(location.country) or ""
-    zip_code = clean_text(location.zip) if location.zip else None
+    state = clean_text(location.state) if location.state else None
+    city = clean_text(location.city) if location.city else None
+    zip = clean_text(location.zip) if location.zip else None
 
     # Return None if no meaningful location data
-    if not any([city, state, country]):
-        return None
-
-    return LocationOut(city=city, state=state, country=country, zip=zip_code)
+    return LocationOut(
+            country=country,
+            state=state,
+            city=city,
+            zip=zip,
+    )
 

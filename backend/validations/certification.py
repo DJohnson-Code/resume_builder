@@ -16,9 +16,12 @@ def clean_certifications(
     out: List[CertificationOut] = []
 
     for cert in items:
-        name = clean_text(cert.name)
-        issuer = clean_text(cert.issuer)
+        name = clean_text(cert.name) or ""
+        issuer = clean_text(cert.issuer) or ""
+        issue_date = first_of_month(cert.issue_date) if cert.issue_date else None
+        expiry_date = first_of_month(cert.expiry_date) if cert.expiry_date else None
         credential_id = clean_text(cert.credential_id) if cert.credential_id else None
+        verification_url = cert.verification_url if cert.verification_url else None
 
         # Validate required fields after cleaning
         if not name:
@@ -27,9 +30,7 @@ def clean_certifications(
             raise HTTPException(status_code=422, detail="Certification issuer required.")
 
         # Normalize dates to first of month (Pydantic already parsed JSON strings to date objects)
-        issue_date = first_of_month(cert.issue_date) if cert.issue_date else None
-        expiry_date = first_of_month(cert.expiry_date) if cert.expiry_date else None
-
+        
         out.append(
             CertificationOut(
                 name=name,
@@ -37,7 +38,7 @@ def clean_certifications(
                 issue_date=issue_date,
                 expiry_date=expiry_date,
                 credential_id=credential_id,
-                verification_url=cert.verification_url,
+                verification_url=verification_url,
             )
         )
 
