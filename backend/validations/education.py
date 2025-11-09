@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, List
 from models import EducationIn, EducationOut
-from .utils import title_case, first_of_month
+from utils import title_case, first_of_month
 
 
 def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:

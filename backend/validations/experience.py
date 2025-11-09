@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, List
 from fastapi import HTTPException
 from models import ExperienceIn, ExperienceOut
-from .utils import title_case, clean_text, first_of_month
+from utils import title_case, clean_text, first_of_month
 
 
 def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]:

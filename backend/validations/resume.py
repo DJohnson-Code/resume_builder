@@ -5,7 +5,7 @@ import phonenumbers
 from phonenumbers import PhoneNumberFormat, NumberParseException
 
 from models import ResumeIn
-from .utils import clean_text, clean_email
+from utils import clean_text, clean_email
 
 
 def invalid_phone(detail: str = "Invalid phone number."):
@@ -15,7 +15,6 @@ def invalid_phone(detail: str = "Invalid phone number."):
 def to_e164(raw: str, region_default: str = "US") -> str:
     """
     Convert raw phone to strict E.164.
-    - If input starts with '+', parse without region hint
     - Else parse with region_default (e.g., 'US')
     - On any failure, raise HTTP 422
     """
@@ -46,7 +45,7 @@ def clean_name(name: str) -> str:
     if not cleaned:
         return ""
 
-    titles = {"mr", "mrs", "ms", "dr", "prof", "professor"}
+    titles = {"mr", "mrs", "ms", "miss", "dr", "prof", "professor"}
     words = cleaned.lower().split()
 
     # Remove titles from the beginning

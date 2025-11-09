@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from models import LocationIn, LocationOut
 from typing import List
-from .utils import clean_text
+from utils import clean_text
 
 
 def clean_location(location: LocationIn | None) -> LocationOut | None:

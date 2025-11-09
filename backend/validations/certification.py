@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional, List
 from fastapi import HTTPException
 from models import CertificationIn, CertificationOut
-from .utils import clean_text, first_of_month
+from utils import clean_text, first_of_month
 
 
 def clean_certifications(
