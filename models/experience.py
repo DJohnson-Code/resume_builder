@@ -20,7 +20,6 @@ class ExperienceBase(BaseModel):
 class ExperienceIn(ExperienceBase):
     """
     Raw experience entry as it is provided by the user.
-    Dates and text may be inconsistent or not entered correctly.
     """
 
     model_config = {"extra": "forbid"}
@@ -29,8 +28,6 @@ class ExperienceIn(ExperienceBase):
 class ExperienceOut(ExperienceBase):
     """
     Cleaned version of an experience entry.
-    Dates are parsed into proper date objects for validation and formatting.
-    Text fields should be whitespace-trimmed and standardized.
     """
 
     start_date: date  # Clean date object - first day of month

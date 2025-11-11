@@ -55,7 +55,6 @@ Thumbs.db
 
 # Project specific
 archive_cli/
-archive_frontend/
 tempCodeRunnerFile.py
 *.log
 .env.local

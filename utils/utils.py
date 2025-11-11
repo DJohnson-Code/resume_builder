@@ -9,10 +9,6 @@ from dateutil import parser
 from dateutil.parser import ParserError
 
 
-# =============================================================================
-# BASE TEXT CLEANING FUNCTIONS
-# =============================================================================
-
 
 def clean_text(s: Optional[str]) -> Optional[str]:
     """
@@ -67,7 +63,7 @@ def clean_date(date_cleaned: Optional[str]) -> Optional[date]:
             yearfirst=True,
             default=datetime(2000, 1, 1),
         )
-        return date(dt.year, dt.month, 1)  # force first of month
+        return date(dt.year, dt.month, 1)  
     except (ParserError, ValueError):
         return None
 
@@ -81,10 +77,6 @@ def first_of_month(d: Optional[date]) -> Optional[date]:
 def normalize_url(u: str) -> str | None:
     """
     Return a normalized URL key for dedup/validation or None if invalid.
-    - Ensures scheme (defaults to https)
-    - Validates netloc exists
-    - Lowercases scheme/host
-    - Strips trailing slash in path
     """
     if not u.startswith(("http://", "https://")):
         u = f"https://{u}"
@@ -124,12 +116,12 @@ def clean_urls(urls: list[str]) -> list[str]:
             continue
 
         seen.add(normalized)
-        out.append(normalized)  # already a nice display form
+        out.append(normalized) 
 
     return out
 
 
-# clean the skills, deduplicate
+
 def clean_skills(skills: list[str]) -> list[str]:
     cleaned: list[str] = []
     seen: set[str] = set()

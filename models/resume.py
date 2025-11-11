@@ -23,7 +23,6 @@ PhoneOut = Annotated[
 class ResumeIn(BaseModel):
     """
     Raw resume data from the user.
-
     All fields will be cleaned and normalized by validation functions
     before being converted to the ResumeOut Model.
     """
@@ -75,6 +74,10 @@ class ResumeOut(BaseModel):
     )  
 
  
+    ai_resume_markdown: str | None = None
+    ai_resume_pdf_url: HttpUrl | None = None
+    ai_model: str | None = None
+
     warnings: list[str] = Field(
         default_factory=list
     ) 

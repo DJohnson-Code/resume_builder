@@ -13,11 +13,7 @@ def invalid_phone(detail: str = "Invalid phone number."):
 
 
 def to_e164(raw: str, region_default: str = "US") -> str:
-    """
-    Convert raw phone to strict E.164.
-    - Else parse with region_default (e.g., 'US')
-    - On any failure, raise HTTP 422
-    """
+    """Convert raw phone to strict E.164."""
     s = (raw or "").strip()
     if not s:
         invalid_phone("Phone number is required")

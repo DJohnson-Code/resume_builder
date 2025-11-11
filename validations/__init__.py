@@ -3,7 +3,7 @@ from .location import clean_location
 from .experience import clean_experience
 from .education import clean_education
 from .certification import clean_certifications
-from .utils import (
+from utils import (
     clean_text,
     title_case,
     clean_date,

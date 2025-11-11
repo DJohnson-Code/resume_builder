@@ -13,13 +13,13 @@ def clean_location(location: LocationIn | None) -> LocationOut | None:
         return None
     
 
-    # Clean each field
+ 
     country = clean_text(location.country) or ""
     state = clean_text(location.state) if location.state else None
     city = clean_text(location.city) if location.city else None
     zip = clean_text(location.zip) if location.zip else None
 
-    # Return None if no meaningful location data
+   
     return LocationOut(
             country=country,
             state=state,

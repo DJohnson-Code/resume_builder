@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from models import ResumeIn, ResumeOut
+from utils import clean_skills, clean_email
 from validations import (
     clean_skills,
     clean_name,
@@ -13,7 +14,6 @@ from validations import (
     clean_certifications,
 )
 
-# Initialize the FastAPI app with a title (shows in docs at /docs or /redoc)
 app = FastAPI(title="Resume Builder API")
 
 
@@ -21,9 +21,6 @@ app = FastAPI(title="Resume Builder API")
 def health():
     """
     Health check endpoint.
-
-    Returns:
-        dict: A simple status message confirming the API is up and running.
     """
     return {"status": "ok"}
 

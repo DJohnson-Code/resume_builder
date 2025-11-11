@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field
 class LocationBase(BaseModel):
     """
     Raw location data from user input
-    Fields may be inconsistent
     """
 
     country: str = Field(min_length=1)
@@ -22,6 +21,5 @@ class LocationIn(LocationBase):
 class LocationOut(LocationBase):
     """
     Cleaned location data.
-    All fields should be properly formatted and standardized.
     """
 
