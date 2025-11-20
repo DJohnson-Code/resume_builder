@@ -21,13 +21,10 @@ class Settings:
     MAX_FILE_SIZE: int = int(os.getenv("MAX_FILE_SIZE", "10485760"))  # 10MB
     ALLOWED_EXTENSIONS: set = {".pdf", ".docx", ".txt"}
 
-    # CORS Settings (for frontend integration)
-    CORS_ORIGINS: list = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080",
-    ]
+    # OpenAI Settings
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
 
 
 # Create a global settings instance
