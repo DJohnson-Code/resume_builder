@@ -56,7 +56,10 @@ class ResumeOut(BaseModel):
     cleaned_location: LocationOut | None = None 
 
    
-    cleaned_urls: list[HttpUrl] = Field(default_factory=list)  
+    cleaned_urls: list[HttpUrl] = Field(
+        default_factory=list
+    )  
+    
     cleaned_experience: list[ExperienceOut] = Field(
         default_factory=list
     ) 

@@ -2,6 +2,7 @@ from __future__ import annotations
 from models import ResumeOut
 from config import settings 
 from openai import OpenAI
+from services.prompts import build_resume_prompt
 
 
 class AIService: 
@@ -14,4 +15,6 @@ class AIService:
         self.client = OpenAI(api_key=self.api_key)
 
     def generate_resume(self, cleaned: ResumeOut) -> dict: 
-        pass
+        prompt = build_resume_prompt(cleaned)
+        
+
