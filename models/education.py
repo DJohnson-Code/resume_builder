@@ -12,7 +12,7 @@ class EducationBase(BaseModel):
 
     school: Annotated[str, Field(min_length=1)]
     degree: str | None = None
-    start_date: date | None = None  # Optional in input
+    start_date: date | None = None 
     graduation_date: date | None = None
     gpa: float | None = Field(default=None, ge=0.0, le=4.0)
 

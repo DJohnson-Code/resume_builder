@@ -109,7 +109,16 @@ def build_resume_prompt(resume: ResumeOut) -> str:
     else:
         education_details = "- (none)\n"
 
-    # TODO: skills, certifications sections
+
+    skills = resume.cleaned_skills
+    
+    if skills: 
+        skills_lines = "\n".join(f"- {skill}" for skill in skills) + "\n"
+    else: 
+        skills_lines = "- (none)\n"
+
+    
+    # TODO: certifications sections
     # TODO: Assemble final prompt string and return it
     
     return ""  # Placeholder - needs to be completed
