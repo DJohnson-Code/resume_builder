@@ -3,6 +3,7 @@ from __future__ import annotations
 from models import ResumeOut
 
 
+
 def build_resume_prompt(resume: ResumeOut) -> str:
     name = resume.cleaned_name
     email = resume.cleaned_email
@@ -83,11 +84,11 @@ def build_resume_prompt(resume: ResumeOut) -> str:
 
             header_parts: list[str] = []
 
-            if degree: 
-                header_parts.append(degree)
-
             if school:
                 header_parts.append(school)
+
+            if degree: 
+                header_parts.append(degree)
 
             dates_part = ""
             if start and grad:
@@ -117,8 +118,39 @@ def build_resume_prompt(resume: ResumeOut) -> str:
     else: 
         skills_lines = "- (none)\n"
 
-    
-    # TODO: certifications sections
+    certifications = resume.cleaned_certifications
+
+    if certifications:
+        certification_lines: list[str] = []
+
+        for cert in certifications:
+            cert_name = cert.name
+            issuer = cert.issuer
+            issue_date = cert.issue_date.strftime("%Y-%m") if cert.issue_date else ""
+            expiry_date = cert.expiry_date.strftime("%Y-%m") if cert.expiry_date else ""
+
+            header_parts: list[str] = [cert_name, issuer]
+
+            if issue_date and expiry_date:
+                header_parts.append(f"{issue_date} – {expiry_date}")
+            elif issue_date:
+                header_parts.append(issue_date)
+            elif expiry_date:
+                header_parts.append(f"Expires {expiry_date}")
+
+            certification_lines.append("- " + " | ".join(header_parts))
+
+            if cert.credential_id:
+                certification_lines.append(f"  - Credential ID: {cert.credential_id}")
+
+            if cert.verification_url:
+                certification_lines.append(f"  - Verification: {cert.verification_url}")
+
+        certification_details = "\n".join(certification_lines) + "\n"
+    else:
+        certification_details = "- (none)\n"
+ 
+
     # TODO: Assemble final prompt string and return it
     
-    return ""  # Placeholder - needs to be completed
+    return ""  # Placeholder - needs to be completed 
