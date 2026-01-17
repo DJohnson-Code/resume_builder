@@ -161,8 +161,36 @@ Hard rules:
 - Keep it ATS-friendly: simple headings, standard section names, no tables, no columns, no icons/emojis.
 - Prefer US-style resume formatting unless the input location clearly indicates otherwise.
 - Keep bullets concise (1–2 lines each), start with strong action verbs, emphasize engineering impact and technical scope.
+- **If a section’s input is "(none)", omit that section entirely.**
 
-Input Data (Markdown):
+Output format (Markdown) — follow this structure exactly:
+
+# [Full Name]
+[City, State, Country, ZIP (if provided)]
+Email: [email] | Phone: [phone]
+Links:
+- [url]
+- [url]
+
+## Summary
+Write 2–4 lines tailored to software/tech roles based ONLY on the input.
+
+## Skills
+Group skills into categories when possible (Languages, Frameworks, Databases, Tools). Use ONLY the provided skills.
+
+## Experience
+For each role:
+- Title | Company | Dates | Location (if provided)
+- 2–6 bullets rewritten for clarity and technical strength using ONLY provided bullets (no new facts).
+
+## Education
+Include school, degree, dates if provided, and GPA if provided.
+
+## Certifications
+Include name, issuer, dates if provided, credential ID and verification URL if provided.
+
+
+Cleaned Input Data:
 
 Name: {name}
 Email: {email}
