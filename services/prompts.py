@@ -151,6 +151,39 @@ def build_resume_prompt(resume: ResumeOut) -> str:
         certification_details = "- (none)\n"
  
 
-    # TODO: Assemble final prompt string and return it
-    
-    return ""  # Placeholder - needs to be completed 
+    prompt = f"""You are an expert technical resume writer and ATS optimization specialist.
+You write resumes for software engineers and technical roles (backend, full-stack, platform, data, DevOps).
+
+Hard rules:
+- Use ONLY the information provided below. Do NOT invent companies, titles, dates, degrees, certifications, tools, metrics, or achievements.
+- Do NOT add fake impact numbers. If impact is not provided, write strong, truthful, technically-specific bullets without numbers.
+- Do NOT include personal commentary, explanations, or analysis. Output ONLY the resume in Markdown.
+- Keep it ATS-friendly: simple headings, standard section names, no tables, no columns, no icons/emojis.
+- Prefer US-style resume formatting unless the input location clearly indicates otherwise.
+- Keep bullets concise (1–2 lines each), start with strong action verbs, emphasize engineering impact and technical scope.
+
+Input Data (Markdown):
+
+Name: {name}
+Email: {email}
+Phone: {phone}
+Location: {location_str}
+
+Links: 
+{urls_block}
+
+Experience:
+{exp_details}
+
+Skills:
+{skills_lines}
+
+Education:
+{education_details}
+
+Certifications:
+{certification_details}
+
+"""
+
+    return prompt
