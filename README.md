@@ -1,92 +1,152 @@
-# Resume Builder (Work in Progress)
+# Resume Builder API
 
-An AI-powered resume builder app written in Python.  
-It collects user input, validates and cleans the data, and formats a structured resume that can be enhanced by OpenAI's API.  
-The goal: ensure **consistent, clean, professional input** before sending data to AI, while keeping output flexible.
-
----
+A FastAPI-based REST API that validates, cleans, and AI-enhances resume data for software engineers and technical roles.
 
 ## Features
 
 - **Validation & Cleaning**
-  - Normalizes names, locations, dates, skills, certifications
-  - Deduplicates skills/certs, enforces date ranges for experiences
-  - Location parsing powered by [`pyap`](https://pypi.org/project/pyap/) with fallback cleaning
-- **Data Models**
-  - `ResumeIn` / `ResumeOut` with structured fields
-  - `LocationIn` / `LocationOut` for city/state/country/zip
-  - Input models forbid extra fields (`extra="forbid"`) for safety
-- **Architecture**
-  - Input → Validation/Cleaning → Structured Models → AI API → Resume Output
-- **Future Output**
-  - Export to `.txt`, `.pdf`, `.json`
-  - Multiple resume formats/templates
-- **Future AI Enhancements**
-  - Bullet point suggestions
-  - Grammar/tone improvements
-  - Tailoring resumes to job descriptions
+  - Phone numbers normalized to E.164 format
+  - Names cleaned (removes titles like Dr., Prof.)
+  - Dates normalized to first-of-month
+  - Skills and URLs deduplicated
+  - Locations parsed and structured
 
----
+- **Pydantic Models**
+  - `ResumeIn` / `ResumeOut` with strict validation
+  - Separate models for Experience, Education, Certification, Location
+  - Input models forbid extra fields (`extra="forbid"`)
 
-## Why This Approach?
-
-- **Clean Input**: Validate data before expensive AI calls
-- **Consistency**: Same formatting rules across all resumes
-- **Cost Efficiency**: AI focuses on content, not basic formatting
-- **Flexibility**: AI can enhance content while maintaining structure
-
----
+- **AI-Powered Enhancement**
+  - Generates polished, ATS-friendly resumes
+  - Anti-hallucination rules prevent fabricated content
+  - Outputs clean Markdown format
 
 ## Tech Stack
 
-- **Python 3.13**
-- **Pydantic** for models/validation
-- **pyap** for location parsing
-- **dateutil** for date normalization
-- **Git + GitHub** for version control
-- _(planned)_ FastAPI for a backend API layer
-- _(planned)_ OpenAI API for AI-powered resume generation
-
----
+- **Python 3.10+**
+- **FastAPI** — REST API framework
+- **Pydantic** — Data validation and serialization
+- **OpenAI API** — AI-powered resume generation
+- **phonenumbers** — Phone validation and E.164 formatting
+- **python-dateutil** — Date parsing and normalization
+- **Poetry** — Dependency management
 
 ## Project Structure
 
 ```
 resume_builder/
-├── backend/
-│   ├── models.py      # Pydantic data models
-│   ├── validations.py # Data cleaning/validation functions
-│   └── main.py        # API endpoints (planned)
-├── frontend/
-│   ├── index.html     # Web interface
-│   ├── script.js      # Frontend logic
-│   └── style.css      # Styling
-└── README.md
+├── main.py                 # FastAPI app entry point
+├── config.py               # Environment-based settings
+├── models/                 # Pydantic In/Out model pairs
+│   ├── resume.py
+│   ├── experience.py
+│   ├── education.py
+│   ├── certification.py
+│   └── location.py
+├── validations/            # Cleaning functions per model
+│   ├── resume.py
+│   ├── experience.py
+│   ├── education.py
+│   ├── certification.py
+│   └── location.py
+├── utils/                  # Shared utility functions
+│   └── utils.py
+├── services/               # Business logic
+│   ├── validation_service.py
+│   ├── ai_service.py
+│   └── prompts.py
+├── routes/                 # API endpoints
+│   └── routes.py
+├── tests/                  # Test suite
+├── docs/                   # Documentation
+└── pyproject.toml          # Poetry dependencies
 ```
 
----
+## Setup
 
-## Setup Instructions (WIP)
-
-1. Clone the repo:
-
+1. **Clone the repo:**
    ```bash
    git clone https://github.com/DJohnson-Code/resume_builder.git
    cd resume_builder
    ```
 
-2. Create a virtual environment:
-
+2. **Install dependencies:**
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate   # Mac/Linux
-   .venv\Scripts\activate      # Windows
+   poetry install
    ```
 
-3. Install dependencies:
-
+3. **Set environment variables:**
    ```bash
-   pip install -r requirements.txt
+   export OPENAI_API_KEY="your-api-key"
    ```
 
-4. Run tests or try a CLI prototype (WIP).
+4. **Run the server:**
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+## API Endpoints
+
+### Health Check
+```
+GET /api/health
+```
+Returns `{"status": "ok"}`
+
+### Validate & Generate Resume
+```
+POST /api/resume/validate
+Content-Type: application/json
+```
+
+**Example request:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1 555-123-4567",
+  "skills": ["Python", "FastAPI", "PostgreSQL"],
+  "location": {
+    "country": "USA",
+    "state": "CA",
+    "city": "San Francisco"
+  },
+  "experience": [{
+    "company": "Acme Corp",
+    "position": ["Senior Software Engineer"],
+    "start_date": "2022-01-15",
+    "description": ["Built REST APIs serving 1M+ requests/day", "Led team of 5 engineers"]
+  }],
+  "education": [{
+    "school": "MIT",
+    "degree": "BS Computer Science",
+    "start_date": "2016-09-01",
+    "graduation_date": "2020-05-15",
+    "gpa": 3.8
+  }]
+}
+```
+
+**Response:** `ResumeOut` with cleaned data and `ai_resume_markdown`
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+```
+
+## Status
+
+- ✅ Models and validation complete
+- ✅ Prompt builder complete
+- ⚠️ AI service needs OpenAI call implementation
+- 🔜 PDF export
+- 🔜 Multiple resume templates
+
+## License
+
+MIT
