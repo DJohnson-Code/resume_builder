@@ -1,14 +1,21 @@
-from fastapi import APIRouter, HTTPException
+from functools import lru_cache
+from fastapi import APIRouter, Depends
 from models import ResumeIn, ResumeOut
 from services.validation_service import clean_and_validate_resume
 from services.ai_service import AIService
 from config import settings
 
 router = APIRouter(prefix="/api/resume", tags=["Resume"])
-ai_service = AIService()
+
+@lru_cache
+def get_ai_service() -> AIService:
+    return AIService()
 
 @router.post("/validate", response_model=ResumeOut)
-async def validate_resume_route(payload: ResumeIn):
+async def validate_resume_route(
+    payload: ResumeIn,
+    ai_service: AIService = Depends(get_ai_service)
+    ):
     """Validate and clean a resume payload."""
     resume_out = clean_and_validate_resume(payload)
 
