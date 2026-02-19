@@ -21,7 +21,7 @@ async def validate_resume_route(
 
     if resume_out.ok:
         try:
-            ai_content = ai_service.generate_resume(resume_out)
+            ai_content = await ai_service.generate_resume(resume_out)
             resume_out.ai_resume_markdown = ai_content
             resume_out.ai_model = settings.OPENAI_MODEL
         except Exception as e:

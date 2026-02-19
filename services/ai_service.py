@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from models import ResumeOut
 from config import settings 
-from openai import OpenAI
+from openai import AsyncOpenAI
 from services.prompts import build_resume_prompt
 
 
@@ -12,12 +13,12 @@ class AIService:
 
         self.api_key = settings.OPENAI_API_KEY
         self.gpt_model = settings.OPENAI_MODEL
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = AsyncOpenAI(api_key=self.api_key)
 
-    def generate_resume(self, cleaned: ResumeOut) -> str:
+    async def generate_resume(self, cleaned: ResumeOut) -> str:
         prompt = build_resume_prompt(cleaned)
 
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model=self.gpt_model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2

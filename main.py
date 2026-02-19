@@ -12,3 +12,6 @@ def health():
     """
     return {"status": "ok"}
 
+@app.get("/")
+def root():
+    return {"message": "Resume Builder API running"}
