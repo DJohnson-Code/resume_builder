@@ -18,13 +18,13 @@ class AIService:
     async def generate_resume(self, cleaned: ResumeOut) -> str:
         prompt = build_resume_prompt(cleaned)
 
-        response = await self.client.chat.completions.create(
+        response = await self.client.responses.create(
             model=self.gpt_model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2
+            input=[{"role": "user", "content": prompt}],
+            temperature=0.2,
         )
 
-        markdown = (response.choices[0].message.content or "").strip()
+        markdown = (response.output_text or "").strip()
         if not markdown:
             raise RuntimeError("OpenAI returned empty resume content.")
         
