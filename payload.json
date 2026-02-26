@@ -1,0 +1,48 @@
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "+18165551234",
+  "location": {
+    "country": "USA",
+    "state": "CA",
+    "city": "San Francisco",
+    "zip": "94103"
+  },
+  "urls": [
+    "https://www.linkedin.com/in/johndoe",
+    "https://github.com/johndoe"
+  ],
+  "experience": [
+    {
+      "company": "Tech Solutions Inc.",
+      "position": ["Software Engineer"],
+      "start_date": "2020-01-15",
+      "end_date": "2023-12-31",
+      "description": [
+        "Developed and maintained web applications.",
+        "Collaborated with cross-functional teams."
+      ],
+      "location": "San Francisco, CA"
+    }
+  ],
+  "skills": ["Python", "JavaScript", "React", "AWS", "Docker"],
+  "education": [
+    {
+      "school": "University of California, Berkeley",
+      "degree": "Master of Science in Computer Science",
+      "start_date": "2018-09-01",
+      "graduation_date": "2019-05-15",
+      "gpa": 3.8
+    }
+  ],
+  "certifications": [
+    {
+      "name": "AWS Certified Solutions Architect",
+      "issuer": "Amazon Web Services",
+      "issue_date": "2021-03-01",
+      "expiry_date": "2024-03-01",
+      "credential_id": "ABC123DEF456",
+      "verification_url": "https://www.credly.com/badges/abc123def456"
+    }
+  ]
+}
