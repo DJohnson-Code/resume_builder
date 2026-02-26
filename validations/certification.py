@@ -23,13 +23,11 @@ def clean_certifications(
         credential_id = clean_text(cert.credential_id) if cert.credential_id else None
         verification_url = cert.verification_url if cert.verification_url else None
 
-        # Validate required fields after cleaning
         if not name:
             raise HTTPException(status_code=422, detail="Certification name required.")
         if not issuer:
             raise HTTPException(status_code=422, detail="Certification issuer required.")
 
-        # Normalize dates to first of month (Pydantic already parsed JSON strings to date objects)
         
         out.append(
             CertificationOut(

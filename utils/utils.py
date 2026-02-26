@@ -22,7 +22,6 @@ def clean_text(s: Optional[str]) -> Optional[str]:
 
     # Remove most emoji/symbols in supplementary planes
     t = re.sub(r"[\U00010000-\U0010FFFF]", "", t)
-    # Normalize accents: "résumé" -> "resume"
     t = unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode("utf-8")
 
     return t or None

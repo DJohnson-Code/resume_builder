@@ -15,7 +15,6 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
     for experience in items:
         company = title_case(experience.company) or ""
 
-        # Process position as a list - clean each item, remove duplicates and blanks
         if isinstance(experience.position, list):
             positions = []
             seen_positions = set()
@@ -25,7 +24,6 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
                     seen_positions.add(cleaned_position.lower())
                     positions.append(cleaned_position)
         else:
-            # Handle legacy string position
             cleaned_position = title_case(experience.position)
             positions = [cleaned_position] if cleaned_position else []
 
@@ -38,8 +36,6 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
                 status_code=422, detail="End date cannot be before start date."
                 )
 
-
-        # Process description as a list - clean each item, remove duplicates and blanks
         if isinstance(experience.description, list):
             descriptions = []
             seen_descriptions = set()
@@ -49,14 +45,12 @@ def clean_experience(items: Optional[List[ExperienceIn]]) -> List[ExperienceOut]
                     seen_descriptions.add(cleaned_desc.lower())
                     descriptions.append(cleaned_desc)
         else:
-            # Handle legacy string description
             desc_raw = clean_text(experience.description or "")
             descriptions = [line for line in desc_raw.split("\n") if line.strip()]
 
 
         location = title_case(experience.location) if experience.location else None
 
-        # Only add if we have minimum required fields
         if not company:
             raise HTTPException(status_code=422, detail="Company required.")
         if not positions:

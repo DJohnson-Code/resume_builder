@@ -30,8 +30,8 @@ class ExperienceOut(ExperienceBase):
     Cleaned version of an experience entry.
     """
 
-    start_date: date  # Clean date object - first day of month
-    end_date: date | None = None  # Clean date object - first day of month
+    start_date: date  
+    end_date: date | None = None  
 
     @field_serializer("start_date", "end_date")
     def _ym(self, v: date | None, _info) -> str | None:

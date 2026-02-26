@@ -47,7 +47,7 @@ class ResumeOut(BaseModel):
     """
 
 
-    ok: bool  # True if validation succeeded, False if critical errors occurred
+    ok: bool  # True if validation succeeded, False if critical errors occurred 
 
 
     cleaned_name: str  

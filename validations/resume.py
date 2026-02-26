@@ -18,7 +18,6 @@ def to_e164(raw: str, region_default: str = "US") -> str:
     if not s:
         invalid_phone("Phone number is required")
     try:
-        # If user provided international format, don't force a region hint
         region = None if s.startswith("+") else region_default
         num = phonenumbers.parse(s, region)
         if not phonenumbers.is_possible_number(num) or not phonenumbers.is_valid_number(
@@ -44,14 +43,12 @@ def clean_name(name: str) -> str:
     titles = {"mr", "mrs", "ms", "miss", "dr", "prof", "professor"}
     words = cleaned.lower().split()
 
-    # Remove titles from the beginning
     while words and words[0] in titles:
         words.pop(0)
 
     if not words:
         return ""
 
-    # Proper case each word
     return " ".join(word.capitalize() for word in words)
 
 

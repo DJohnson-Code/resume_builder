@@ -22,8 +22,8 @@ class EducationIn(EducationBase):
 
 
 class EducationOut(EducationBase):
-    start_date: date  # Clean date object - first day of month
-    graduation_date: date | None = None  # Clean date object - first day of month
+    start_date: date 
+    graduation_date: date | None = None  
 
     @field_serializer("start_date", "graduation_date")
     def _ym(self, v: date | None, _info) -> str | None:

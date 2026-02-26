@@ -1,7 +1,3 @@
-"""
-Configuration settings for the resume builder application.
-"""
-
 import os
 from typing import Optional
 
@@ -14,7 +10,7 @@ class Settings:
     API_PORT: int = int(os.getenv("API_PORT", "8000"))
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
-    # Database Settings (if you add a database later)
+    # Database Settings (when I add the database)
     DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
 
     # File Upload Settings
@@ -26,6 +22,4 @@ class Settings:
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
-
-# Create a global settings instance
 settings = Settings()
