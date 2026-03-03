@@ -95,7 +95,7 @@ Returns `{"status": "ok"}`
 
 ### Validate & Generate Resume
 ```
-POST /api/resume/validate
+POST /api/v1/resume/validate
 Content-Type: application/json
 ```
 
@@ -125,6 +125,14 @@ Content-Type: application/json
     "gpa": 3.8
   }]
 }
+```
+
+**Response:** `ResumeOut` with cleaned data
+
+### Generate AI Resume
+```
+POST /api/v1/resume/generate
+Content-Type: application/json
 ```
 
 **Response:** `ResumeOut` with cleaned data and `ai_resume_markdown`

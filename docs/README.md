@@ -27,8 +27,11 @@ User Input (JSON) → Pydantic Validation → Cleaning/Normalization → ResumeO
 ### `GET /api/health`
 Health check. Returns `{"status": "ok"}`.
 
-### `POST /api/resume/validate`
-Accepts raw resume JSON, validates/cleans it, generates AI-enhanced resume.
+### `POST /api/v1/resume/validate`
+Accepts raw resume JSON and returns cleaned/validated output.
+
+### `POST /api/v1/resume/generate`
+Accepts raw resume JSON, validates/cleans it, and generates AI-enhanced markdown.
 
 **Request body**: `ResumeIn` schema
 **Response**: `ResumeOut` schema with cleaned data + `ai_resume_markdown`
@@ -38,7 +41,7 @@ Accepts raw resume JSON, validates/cleans it, generates AI-enhanced resume.
 1. **Input Validation**: Pydantic validates `ResumeIn` (types, required fields, patterns)
 2. **Cleaning**: `clean_and_validate_resume()` normalizes all fields
 3. **Prompt Building**: `build_resume_prompt()` formats data for LLM
-4. **AI Generation**: `AIService` sends prompt to OpenAI (WIP)
+4. **AI Generation**: `AIService` sends prompt to OpenAI
 5. **Response**: Returns `ResumeOut` with cleaned data and AI-generated markdown
 
 ## Environment Variables
@@ -77,5 +80,4 @@ pytest -v
 
 - ✅ Models and validation complete
 - ✅ Prompt builder complete
-- ⚠️ AI service incomplete (builds prompt but doesn't call OpenAI yet)
-- ⚠️ Route has method name mismatch with AI service
+- ✅ Versioned resume routes at `/api/v1/resume/*`

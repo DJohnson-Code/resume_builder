@@ -16,12 +16,12 @@ app = FastAPI(title="Resume Builder API")
 app.include_router(resume_router)
 
 @app.get("/api/health")
-def health():
+async def health():
     """
     Health check endpoint.
     """
     return {"status": "ok"}
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Resume Builder API running"}

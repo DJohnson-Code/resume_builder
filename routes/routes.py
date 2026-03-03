@@ -10,7 +10,7 @@ from services.validation_service import clean_and_validate_resume
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/resume", tags=["Resume"])
+router = APIRouter(prefix="/api/v1/resume", tags=["Resume"])
 
 
 @lru_cache
