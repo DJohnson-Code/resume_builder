@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 
 from config import settings
 from models import ResumeIn, ResumeOut
@@ -23,6 +23,19 @@ def get_ai_service() -> AIService:
             detail="AI service not configured",
         )
 
+async def verify_api_key(x_api_key: str | None = Header(default=None)) -> None:
+    if settings.APP_API_KEY is None:
+        raise HTTPException(
+            status_code=503,
+            detail="API key not configured",
+        )
+
+    if x_api_key != settings.APP_API_KEY:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized",
+        )
+
 
 @router.post("/validate", response_model=ResumeOut)
 async def validate_resume_route(payload: ResumeIn) -> ResumeOut:
@@ -33,7 +46,9 @@ async def validate_resume_route(payload: ResumeIn) -> ResumeOut:
 async def generate_resume_route(
     payload: ResumeIn,
     ai_service: AIService = Depends(get_ai_service),
+    _: None = Depends(verify_api_key),
 ) -> ResumeOut:
+
     resume_out = clean_and_validate_resume(payload)
 
     try:
