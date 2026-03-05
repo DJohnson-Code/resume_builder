@@ -4,12 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from fastapi import FastAPI
+from routes.routes import router as resume_router 
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-from fastapi import FastAPI
-from routes.routes import router as resume_router 
 
 app = FastAPI(title="Resume Builder API")
 
