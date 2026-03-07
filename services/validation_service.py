@@ -33,11 +33,11 @@ def clean_and_validate_resume(payload: ResumeIn) -> ResumeOut:
         [str(url) for url in payload.urls] if payload.urls else []
     )
     cleaned_experience = clean_experience(payload.experience)
-    cleaned_education = clean_education(payload.education)
+    cleaned_education, education_warnings = clean_education(payload.education)
     cleaned_skills = clean_skills(payload.skills)
     cleaned_certifications = clean_certifications(payload.certifications)
 
-    warnings = resume_warnings(payload)
+    warnings = resume_warnings(payload) + education_warnings
 
     return ResumeOut(
         ok=True,

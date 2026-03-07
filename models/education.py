@@ -22,7 +22,7 @@ class EducationIn(EducationBase):
 
 
 class EducationOut(EducationBase):
-    start_date: date 
+    start_date: date | None = None
     graduation_date: date | None = None  
 
     @field_serializer("start_date", "graduation_date")

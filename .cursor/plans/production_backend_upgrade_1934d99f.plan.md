@@ -1,1262 +1,341 @@
 ---
-name: Production Backend Upgrade
-overview: Upgrade the Resume Builder API to production-ready status by adding PostgreSQL persistence, JWT authentication, idempotency, rate limiting, structured logging, comprehensive tests, and deployment infrastructure - while preserving the existing validation/normalization architecture.
+name: Resume Builder Build Plan
+overview: Replace the stale production upgrade plan with an accurate, milestone-phased engineering build plan reflecting current codebase state, completed work, known issues, and the A/B/C roadmap.
 todos:
-  - id: phase1-db
-    content: "Phase 1: Add SQLAlchemy models, Alembic migrations, and DB session management"
+  - id: a1-conftest
+    content: Create tests/conftest.py with fixture to control config.settings (APP_API_KEY, OPENAI_API_KEY) for deterministic tests
     status: pending
-  - id: phase2-auth
-    content: "Phase 2: Implement JWT authentication (register/login endpoints + middleware)"
+  - id: a1-fix-auth-test
+    content: Fix existing test_generate_auth.py to use conftest fixture, verify deterministic 401
     status: pending
-  - id: phase3-persist
-    content: "Phase 3: Refactor POST /validate to persist resumes and generations to DB"
+  - id: a1-wrong-key
+    content: "Add test: wrong X-API-Key -> 401"
     status: pending
-  - id: phase4-idempotency
-    content: "Phase 4: Add idempotency key handling for POST requests"
+  - id: a1-validate-open
+    content: "Add test: /validate with no API key -> 200"
     status: pending
-  - id: phase5-pagination
-    content: "Phase 5: Implement pagination for list endpoints"
+  - id: a1-app-key-unset
+    content: "Add test: APP_API_KEY=None -> 503 on /generate"
     status: pending
-  - id: phase6-rate-limit
-    content: "Phase 6: Add rate limiting and structured logging"
+  - id: a1-openai-unset
+    content: "Add test: OPENAI_API_KEY missing -> 503 on /generate"
     status: pending
-  - id: phase7-tests
-    content: "Phase 7: Write comprehensive test suite (auth, CRUD, generation, idempotency, pagination)"
+  - id: a2-mock-success
+    content: "Add mocked AI success test: correct key + mock AI -> 200 with ai_resume_markdown"
     status: pending
-  - id: phase8-deploy
-    content: "Phase 8: Create Dockerfile, docker-compose, and deployment docs"
+  - id: a2-mock-failure
+    content: "Add mocked AI failure test: mock raises -> 503"
+    status: pending
+  - id: a3-gpa-bug
+    content: Fix GPA truthiness bug in validations/education.py (0.0 treated as None)
+    status: pending
+  - id: a3-edu-drop
+    content: Decide and implement education silent-drop behavior (warn or raise 422)
+    status: pending
+  - id: a4-unicode
+    content: Decide clean_text() Unicode handling and document the decision
+    status: pending
+  - id: a5-env-example
+    content: Create .env.example with all required/optional env vars
+    status: pending
+  - id: a6-readme
+    content: Rewrite README.md to match current codebase
+    status: pending
+  - id: a7-stale-docs
+    content: Clean up or remove stale tests/README.md, scripts/README.md, update docs/README.md
     status: pending
 isProject: false
 ---
 
-Production-Ready Backend Upgrade Plan
+# Resume Builder API -- Engineering Build Plan
 
-A) Codebase Assessment
+## 1. Project Snapshot
 
-Current Architecture
+**Repo:** `/home/hendrix/Projects/resume_builder`
+**Stack:** Python 3.10+, FastAPI 0.115, Pydantic v2.9, OpenAI SDK >=2.8, phonenumbers, python-dateutil, Poetry
+**Purpose:** Backend-only REST API that accepts raw resume JSON, validates/cleans it, and optionally generates ATS-friendly Markdown via OpenAI.
 
-resume_builder/
+### Endpoints (current)
 
-├── [main.py](http://main.py)                    # FastAPI app, includes health endpoint
+- `GET /` -- root greeting
+- `GET /api/health` -- health check
+- `POST /api/v1/resume/validate` -- clean and validate only, no auth required
+- `POST /api/v1/resume/generate` -- validate + AI generation, requires `X-API-Key` header
 
-├── [config.py](http://config.py)                  # Settings class (env-based, DATABASE_URL placeholder exists)
-
-├── routes/[routes.py](http://routes.py)           # Single route: POST /api/resume/validate
-
-├── services/
-
-│   ├── ai_[service.py](http://service.py)         # OpenAI client wrapper
-
-│   ├── [prompts.py](http://prompts.py)            # LLM prompt builder
-
-│   └── validation_[service.py](http://service.py) # Orchestrates cleaning functions
-
-├── models/                    # Pydantic In/Out pairs (resume, experience, education, etc.)
-
-├── validations/              # Domain cleaning logic (phone→E.164, name title removal, etc.)
-
-└── utils/                    # Generic helpers (clean_text, clean_date, normalize_url, etc.)
-
-Request Flow (Current)
-
-POST /api/resume/validate receives ResumeIn payload
-
-Pydantic validates structure
-
-clean_and_validate_resume() orchestrates all validations → ResumeOut
-
-If ok=True, calls AIService.generate_resume() (synchronous OpenAI SDK call)
-
-Returns ResumeOut with ai_resume_markdown populated
-
-Patterns Worth Preserving
-
-In/Out Pydantic model pairs - clean separation of raw vs validated data
-
-Validation modules per domain - experience, education, certification cleaners
-
-Reusable utilities - date parsing, URL normalization, text cleaning
-
-Settings class pattern - already has DATABASE_URL placeholder
-
-Current Issues to Address
-
-No persistence - everything is ephemeral
-
-No auth - anyone can call the API
-
-Import-time crash - ai_service = AIService() instantiated at module load
-
-Blocking LLM calls - synchronous OpenAI calls block event loop
-
-print() statements - no structured logging
-
-No tests beyond health check
-
-B) Integration Plan (Phase-by-Phase)
-
-Phase 0: Repo Reconnaissance ✓
-
-Already Complete - Entry point is [main.py](http://main.py), single router in routes/[routes.py](http://routes.py), Pydantic models in models/, validation orchestration in services/validation_[service.py](http://service.py).
-
-Phase 1: Database Foundation
-
-Goal: Add SQLAlchemy + Alembic without breaking existing code.
-
-Files to Create:
-
-db/**init**.py - empty
-
-db/[session.py](http://session.py) - engine, SessionLocal, get_db dependency
-
-db/[base.py](http://base.py) - Base class import hub
-
-db/models/[user.py](http://user.py) - User ORM model
-
-db/models/[resume.py](http://resume.py) - Resume ORM model (stores cleaned data + metadata)
-
-db/models/[generation.py](http://generation.py) - Generation ORM model (LLM call history)
-
-db/models/idempotency_[key.py](http://key.py) - IdempotencyKey ORM model
-
-alembic.ini - Alembic config
-
-alembic/[env.py](http://env.py) - Alembic environment setup
-
-alembic/versions/001_[initial.py](http://initial.py) - Initial migration
-
-Files to Edit:
-
-[config.py](http://config.py) - Add JWT_SECRET, JWT_ALGORITHM, DATABASE_URL validation, rate limit config
-
-Database Schema:
-
-# users table
-
-id: UUID (PK)
-
-email: str (unique, indexed)
-
-hashed_password: str
-
-full_name: str | None
-
-is_active: bool = True
-
-created_at: datetime
-
-updated_at: datetime
-
-# resumes table
-
-id: UUID (PK)
-
-user_id: UUID (FK → [users.id](http://users.id), indexed)
-
-title: str  # User-defined resume title
-
-cleaned_data: JSONB  # Stores ResumeOut.model_dump(mode="json")
-
-created_at: datetime
-
-updated_at: datetime
-
-# generations table
-
-id: UUID (PK)
-
-resume_id: UUID (FK → [resumes.id](http://resumes.id), indexed)
-
-user_id: UUID (FK → [users.id](http://users.id), indexed)
-
-status: enum('pending', 'completed', 'failed')
-
-model_name: str  # e.g., "gpt-4o-mini"
-
-prompt_version: str  # e.g., "v1"
-
-input_hash: str  # hash of input for deduplication
-
-output_markdown: text | None
-
-error_message: text | None
-
-tokens_used: int | None
-
-cost_usd: decimal | None
-
-started_at: datetime
-
-completed_at: datetime | None
-
-created_at: datetime
-
-# idempotency_keys table
-
-id: UUID (PK)
-
-key: str (unique, indexed)
-
-user_id: UUID (FK → [users.id](http://users.id), indexed)
-
-request_hash: str  # hash(method + path + body)
-
-response_status: int
-
-response_body: JSONB
-
-expires_at: datetime (indexed for cleanup)
-
-created_at: datetime
-
-Acceptance Criteria:
-
-poetry add sqlalchemy psycopg2-binary alembic
-
-alembic init alembic generates structure
-
-get_db() dependency yields sessions with proper cleanup
-
-alembic upgrade head creates all tables without errors
-
-Config validates DATABASE_URL is set
-
-Phase 2: Auth (Upgrade-in-Place)
-
-Goal: Add JWT auth without changing existing /validate endpoint behavior initially.
-
-Files to Create:
-
-services/auth_[service.py](http://service.py) - password hashing, JWT encode/decode
-
-routes/[auth.py](http://auth.py) - register, login endpoints
-
-dependencies/[auth.py](http://auth.py) - get_current_user() dependency
-
-Files to Edit:
-
-[main.py](http://main.py) - include auth router
-
-[config.py](http://config.py) - Add JWT_SECRET, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-
-New Endpoints:
-
-POST /api/auth/register
-
-  Request: {"email": str, "password": str, "full_name": str}
-
-  Response: {"id": UUID, "email": str}
-
-POST /api/auth/login
-
-  Request: {"email": str, "password": str}
-
-  Response: {"access_token": str, "token_type": "bearer"}
-
-Dependency Pattern:
-
-# dependencies/[auth.py](http://auth.py)
-
-from fastapi import Depends, HTTPException, status
-
-from [fastapi.security](http://fastapi.security) import HTTPBearer, HTTPAuthorizationCredentials
-
-from sqlalchemy.orm import Session
-
-from services.auth_service import decode_access_token
-
-from db.session import get_db
-
-from db.models.user import User
-
-security = HTTPBearer()
-
-def get_current_user(
+### Module Layout
 
 ```
-credentials: HTTPAuthorizationCredentials = Depends(security),
-
-db: Session = Depends(get_db),
+main.py                        # App entrypoint, .env load, logging, router wiring
+config.py                      # Env-backed Settings class (singleton)
+routes/routes.py               # API routes, verify_api_key, get_ai_service
+services/validation_service.py # Cleaning orchestrator -> ResumeOut
+services/ai_service.py         # AsyncOpenAI wrapper
+services/prompts.py            # LLM prompt builder from ResumeOut
+models/                        # Pydantic In/Out schema pairs
+  resume.py, experience.py, education.py, certification.py, location.py
+validations/                   # Per-domain cleaning functions
+  resume.py, experience.py, education.py, certification.py, location.py
+utils/utils.py                 # Shared helpers (clean_text, first_of_month, clean_urls, etc.)
+tests/                         # Async endpoint tests (pytest + httpx + ASGITransport)
+  test_health.py, test_resume_versioning.py, test_generate_auth.py
 ```
 
-) -> User:
+---
+
+## 2. Architecture Decisions (locked in)
+
+- **Validate/Generate split is intentional.** `/validate` is stateless, free, unauthenticated. `/generate` is protected, billable, and delegates to OpenAI. This separation exists for cost control, security boundaries, and failure isolation. Do not merge them.
+- **APP_API_KEY != OPENAI_API_KEY.** `APP_API_KEY` gates client-to-backend access; `OPENAI_API_KEY` gates backend-to-OpenAI calls. They are separate concerns and must stay separate.
+- **APP_API_KEY is a portfolio/demo-phase mechanism.** Acceptable now. Real user auth (JWT) belongs in a future milestone when a frontend or public product exists.
+- **API versioning** is already in place: router prefix is `/api/v1/resume`.
+- **FastAPI dependency injection** is used for both auth (`verify_api_key`) and AI service creation (`get_ai_service` with `@lru_cache`).
+- **Internal exceptions are logged, not leaked.** `logger.exception(...)` in the route, generic `503` returned to clients.
+- **No `print()` statements** exist in the codebase. Logging uses the `logging` module (currently only one call site in `routes/routes.py`).
+
+---
+
+## 3. Completed Work
+
+- API versioning under `/api/v1/resume`
+- App-level API key protection on `/generate` via `verify_api_key` dependency
+- Validate/generate responsibility split with separate route handlers
+- OpenAI integration implemented (`services/ai_service.py` using `AsyncOpenAI.responses.create`)
+- Prompt builder with anti-hallucination rules (`services/prompts.py`)
+- Full cleaning pipeline: phone -> E.164, name title removal, date first-of-month, URL dedup, skill dedup, experience/education/certification normalization
+- Pydantic In/Out model pairs with `extra="forbid"` on inputs and `YYYY-MM` date serializers on outputs
+- Baseline logging config in `main.py`
+- Three async endpoint tests: health, versioning, missing-API-key auth
+
+---
+
+## 4. Known Issues and Risks
+
+
+| ID       | Location                                                         | Issue                                                                                                                                               | Severity         |
+| -------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| BUG-1    | [validations/education.py](validations/education.py) line 24     | `education.gpa if education.gpa else None` treats `0.0` as falsy, turning a valid GPA into `None`                                                   | Medium           |
+| BUG-2    | [validations/education.py](validations/education.py) lines 26-35 | Entries missing `school` or `start_date` are silently dropped with no warning or error                                                              | Medium           |
+| RISK-1   | [utils/utils.py](utils/utils.py) lines 23-25                     | `clean_text()` NFKD-normalizes to ASCII, stripping accents and non-Latin characters. Lossy for names like "Rene" (from "Rene"), schools, and cities | Medium           |
+| RISK-2   | [validations/certification.py](validations/certification.py)     | No check that `expiry_date >= issue_date`                                                                                                           | Low              |
+| RISK-3   | [tests/test_generate_auth.py](tests/test_generate_auth.py)       | Test expects `401` for missing key, but gets `503` if `APP_API_KEY` is unset in env. Test is environment-sensitive                                  | High (blocks CI) |
+| STALE-1  | [README.md](README.md) line 154                                  | Says "AI service needs OpenAI call implementation" -- already implemented                                                                           | Low              |
+| STALE-2  | [tests/README.md](tests/README.md)                               | References `test_models.py`, `test_validations.py`, `test_api.py` -- none exist                                                                     | Low              |
+| STALE-3  | [scripts/README.md](scripts/README.md)                           | References `setup.sh`, `deploy.sh`, `backup.sh`, `migrate.py` -- none exist                                                                         | Low              |
+| UNUSED-1 | [utils/utils.py](utils/utils.py) `clean_date()`                  | Defined but never called in current flow; Pydantic handles date parsing                                                                             | Low              |
+| UNUSED-2 | [models/resume.py](models/resume.py) `ai_resume_pdf_url`         | Placeholder field, never populated                                                                                                                  | Low              |
+
+
+---
+
+## 5. Milestone Roadmap
+
+---
+
+### MILESTONE A -- Portfolio-Grade, Public-Safe API
+
+**Purpose:** Make the project safe to show publicly, coherent to explain, stable to test, and credible as a backend portfolio piece.
+
+#### A.1 -- Deterministic Auth and Config Tests (required)
+
+Make all tests reproducible regardless of host environment by controlling `settings` values inside tests.
+
+- **A.1.1** Create `tests/conftest.py` with a fixture that patches `config.settings` attributes (specifically `APP_API_KEY` and `OPENAI_API_KEY`) so tests do not depend on the host `.env`.
+- **A.1.2** Fix existing `test_generate_auth.py` -- set `APP_API_KEY` to a known value in the test fixture, then assert `401` for missing key. This resolves RISK-3.
+- **A.1.3** Add test: wrong `X-API-Key` header -> `401`.
+- **A.1.4** Add test: `APP_API_KEY` not configured (set to `None`) -> `503`.
+- **A.1.5** Add test: `/validate` remains open without any API key -> `200`.
+- **A.1.6** Add test: missing `OPENAI_API_KEY` on `/generate` path -> `503` (exercises `get_ai_service` raising).
+
+#### A.2 -- Mocked AI Success Path Test (required)
+
+- **A.2.1** Add test: correct `X-API-Key` + valid payload + mocked `AIService.generate_resume` returning a markdown string -> `200`, response contains `ai_resume_markdown` and `ai_model`. Use `app.dependency_overrides[get_ai_service]` or `unittest.mock.patch` on the `AIService` method. No real OpenAI calls.
+- **A.2.2** Add test: correct key + AI raises an exception -> `503` (exercises the `except Exception` branch in `generate_resume_route`).
+
+#### A.3 -- Fix Known Correctness Bugs (required)
+
+- **A.3.1** Fix GPA truthiness bug in [validations/education.py](validations/education.py) line 24. Change to `education.gpa if education.gpa is not None else None`.
+- **A.3.2** Decide on silent-drop behavior for education entries: either (a) add a warning to `ResumeOut.warnings` when an entry is dropped, or (b) raise `HTTPException(422)` for missing required fields. Recommended: add a warning and continue, consistent with the rest of the validation layer.
+
+#### A.4 -- Normalization Decision (required -- decide, not necessarily change)
+
+- **A.4.1** Explicitly decide whether `clean_text()` should preserve Unicode or keep the current ASCII transliteration. The current behavior is lossy for accented characters. Options:
+  - (a) Keep ASCII-only and document this as an intentional constraint for ATS compatibility.
+  - (b) Switch to Unicode-preserving: remove the `.encode("ascii","ignore")` line, keep only emoji stripping and whitespace collapse.
+- **A.4.2** Whatever the decision, add a brief comment in `utils/utils.py` documenting the rationale so future contributors do not re-raise the question.
+
+#### A.5 -- `.env.example` (required)
+
+Create `.env.example` at repo root with:
 
 ```
-token = credentials.credentials
-
-payload = decode_access_token(token)
-
-user = db.query(User).filter([User.id](http://User.id) == payload["sub"]).first()
-
-if not user or not [user.is](http://user.is)_active:
-
-    raise HTTPException(status_code=401, detail="Invalid credentials")
-
-return user
-```
-
-Acceptance Criteria:
-
-Can register new user
-
-Can login and receive JWT
-
-get_current_user() extracts user from valid JWT
-
-Invalid/expired tokens return 401
-
-Phase 3: Persist Core Business Objects
-
-Goal: Modify /api/resume/validate to save resumes + generations to DB.
-
-Files to Create:
-
-repositories/resume_[repository.py](http://repository.py) - CRUD for resumes
-
-repositories/generation_[repository.py](http://repository.py) - CRUD for generations
-
-services/resume_[service.py](http://service.py) - business logic layer
-
-Files to Edit:
-
-routes/[routes.py](http://routes.py):
-
-Add current_user: User = Depends(get_current_user) param
-
-Add db: Session = Depends(get_db) param
-
-Save resume after cleaning via ResumeRepository.create()
-
-Create Generation record with status='pending' before LLM call
-
-Update Generation with result after LLM call
-
-Use dependency injection for AIService (fix import-time instantiation)
-
-Wrap LLM call in run_in_threadpool() to avoid blocking
-
-Minimal Diff for routes/[routes.py](http://routes.py):
-
-from functools import lru_cache
-
-from fastapi import Depends
-
-from fastapi.concurrency import run_in_threadpool
-
-from sqlalchemy.orm import Session
-
-from db.session import get_db
-
-from dependencies.auth import get_current_user
-
-from db.models.user import User
-
-from repositories.resume_repository import ResumeRepository
-
-from repositories.generation_repository import GenerationRepository
-
-@lru_cache
-
-def get_ai_service() -> AIService:
-
-```
-return AIService()
-```
-
-@[router.post](http://router.post)("/validate", response_model=ResumeOut)
-
-async def validate_resume_route(
-
-```
-payload: ResumeIn,
-
-db: Session = Depends(get_db),
-
-current_user: User = Depends(get_current_user),
-
-ai_service: AIService = Depends(get_ai_service),
-```
-
-):
-
-```
-# 1. Clean and validate (existing logic)
-
-resume_out = clean_and_validate_resume(payload)
-
-
-
-# 2. Save resume to DB
-
-resume_repo = ResumeRepository(db)
-
-db_resume = resume_repo.create(
-
-    user_id=current_[user.id](http://user.id),
-
-    title=f"Resume {datetime.utcnow().strftime('%Y-%m-%d')}",
-
-    cleaned_data=resume_out.model_dump(mode="json")
-
-)
-
-
-
-if resume_out.ok:
-
-    # 3. Create generation record
-
-    gen_repo = GenerationRepository(db)
-
-    generation = gen_repo.create(
-
-        resume_id=db_[resume.id](http://resume.id),
-
-        user_id=current_[user.id](http://user.id),
-
-        status='pending',
-
-        model_name=settings.OPENAI_MODEL,
-
-        prompt_version='v1'
-
-    )
-
-    
-
-    try:
-
-        # 4. Generate AI content (non-blocking)
-
-        ai_content = await run_in_threadpool(ai_service.generate_resume, resume_out)
-
-        resume_[out.ai](http://out.ai)_resume_markdown = ai_content
-
-        resume_[out.ai](http://out.ai)_model = settings.OPENAI_MODEL
-
-        
-
-        # 5. Update generation as completed
-
-        gen_repo.update_completed([generation.id](http://generation.id), output_markdown=ai_content)
-
-    except Exception as e:
-
-        gen_repo.update_failed([generation.id](http://generation.id), error_message=str(e))
-
-        resume_out.warnings.append(f"AI content generation failed: {e}")
-
-
-
-return resume_out
-```
-
-New Endpoints:
-
-GET /api/resumes  # List user's resumes (paginated)
-
-GET /api/resumes/{resume_id}  # Get specific resume
-
-DELETE /api/resumes/{resume_id}  # Delete resume (ownership check)
-
-GET /api/resumes/{resume_id}/generations  # List generations for resume
-
-Acceptance Criteria:
-
-Resume saved to DB after cleaning
-
-Generation record created before LLM call
-
-Generation updated with result/error after LLM call
-
-LLM call doesn't block event loop
-
-User can only access their own resumes
-
-Phase 4: Idempotency and Dedupe
-
-Goal: Prevent duplicate LLM calls for identical requests.
-
-Files to Create:
-
-middleware/[idempotency.py](http://idempotency.py) - middleware to handle Idempotency-Key header
-
-repositories/idempotency_[repository.py](http://repository.py) - CRUD for idempotency keys
-
-Implementation Strategy:
-
-# middleware/[idempotency.py](http://idempotency.py)
-
-from fastapi import Request, Response
-
-from hashlib import sha256
-
-import json
-
-async def idempotency_middleware(request: Request, call_next):
-
-```
-idempotency_key = request.headers.get("Idempotency-Key")
-
-
-
-if idempotency_key and request.method == "POST":
-
-    # Compute request hash
-
-    body = await request.body()
-
-    request_hash = sha256(
-
-        f"{request.method}:{request.url.path}:{body.decode()}".encode()
-
-    ).hexdigest()
-
-    
-
-    # Check if key exists
-
-    repo = IdempotencyRepository(db)
-
-    existing = repo.get_by_key(idempotency_key, user_id=current_[user.id](http://user.id))
-
-    
-
-    if existing:
-
-        if existing.request_hash == request_hash:
-
-            # Same request - return cached response
-
-            return Response(
-
-                content=json.dumps(existing.response_body),
-
-                status_code=existing.response_status,
-
-                media_type="application/json"
-
-            )
-
-        else:
-
-            # Different request - conflict
-
-            return JSONResponse(
-
-                status_code=409,
-
-                content={"detail": "Idempotency key conflict"}
-
-            )
-
-    
-
-    # New request - process and store
-
-    response = await call_next(request)
-
-    # Store response in DB with TTL (24 hours)
-
-    repo.create(idempotency_key, request_hash, response, expires_at=...)
-
-    return response
-
-
-
-return await call_next(request)
-```
-
-Files to Edit:
-
-[main.py](http://main.py) - add middleware
-
-Acceptance Criteria:
-
-Same Idempotency-Key + same request body → returns cached response (200)
-
-Same Idempotency-Key + different request body → returns 409
-
-Keys expire after 24 hours
-
-Only applies to POST endpoints
-
-Phase 5: Pagination
-
-Goal: Add limit/offset pagination to list endpoints.
-
-Files to Create:
-
-schemas/[pagination.py](http://pagination.py) - Pydantic models for pagination params/response
-
-Pagination Pattern:
-
-# schemas/[pagination.py](http://pagination.py)
-
-from pydantic import BaseModel, Field
-
-class PaginationParams(BaseModel):
-
-```
-offset: int = Field(0, ge=0)
-
-limit: int = Field(20, ge=1, le=100)
-```
-
-class PaginatedResponse(BaseModel):
-
-```
-items: list
-
-total: int
-
-offset: int
-
-limit: int
-
-has_more: bool
-```
-
-Files to Edit:
-
-repositories/resume_[repository.py](http://repository.py) - add list_by_user() with pagination
-
-routes/[routes.py](http://routes.py) - add GET /api/resumes with pagination
-
-Minimal Diff:
-
-@router.get("/resumes")
-
-def list_resumes(
-
-```
-offset: int = 0,
-
-limit: int = 20,
-
-db: Session = Depends(get_db),
-
-current_user: User = Depends(get_current_user),
-```
-
-):
-
-```
-repo = ResumeRepository(db)
-
-total = repo.count_by_user(current_[user.id](http://user.id))
-
-resumes = repo.list_by_user(current_[user.id](http://user.id), offset=offset, limit=limit)
-
-
-
-return {
-
-    "items": resumes,
-
-    "total": total,
-
-    "offset": offset,
-
-    "limit": limit,
-
-    "has_more": offset + limit < total
-
-}
-```
-
-Acceptance Criteria:
-
-GET /api/resumes?offset=0&limit=20 returns paginated results
-
-Response includes total count and has_more flag
-
-Limit capped at 100
-
-Phase 6: Rate Limiting + Logging
-
-Goal: Add per-user rate limiting and structured request logging.
-
-Files to Create:
-
-middleware/rate_[limit.py](http://limit.py) - in-memory rate limiter (production: Redis)
-
-middleware/request_[id.py](http://id.py) - adds request_id to context
-
-utils/[logging.py](http://logging.py) - structured logger setup
-
-Rate Limiter:
-
-# middleware/rate_[limit.py](http://limit.py)
-
-from fastapi import Request, HTTPException
-
-from collections import defaultdict
-
-from datetime import datetime, timedelta
-
-class InMemoryRateLimiter:
-
-```
-def **init**(self, requests_per_minute: int = 60):
-
-    self.requests_per_minute = requests_per_minute
-
-    self.requests = defaultdict(list)
-
-
-
-def check(self, user_id: str):
-
-    now = datetime.utcnow()
-
-    minute_ago = now - timedelta(minutes=1)
-
-    
-
-    # Clean old requests
-
-    self.requests[user_id] = [
-
-        ts for ts in self.requests[user_id] if ts > minute_ago
-
-    ]
-
-    
-
-    if len(self.requests[user_id]) >= self.requests_per_minute:
-
-        raise HTTPException(status_code=429, detail="Rate limit exceeded")
-
-    
-
-    self.requests[user_id].append(now)
-```
-
-rate_limiter = InMemoryRateLimiter()
-
-async def rate_limit_middleware(request: Request, call_next):
-
-```
-# Skip auth endpoints
-
-if request.url.path.startswith("/api/auth"):
-
-    return await call_next(request)
-
-
-
-user = getattr(request.state, "user", None)
-
-if user:
-
-    rate_limiter.check(str([user.id](http://user.id)))
-
-
-
-return await call_next(request)
-```
-
-Structured Logging:
-
-# utils/[logging.py](http://logging.py)
-
-import logging
-
-import json
-
-from datetime import datetime
-
-class StructuredLogger:
-
-```
-def **init**(self, name: str):
-
-    self.logger = logging.getLogger(name)
-
-
-
-def log(self, level: str, message: str, **kwargs):
-
-    log_entry = {
-
-        "timestamp": datetime.utcnow().isoformat(),
-
-        "level": level,
-
-        "message": message,
-
-        **kwargs
-
-    }
-
-    [self.logger.info](http://self.logger.info)(json.dumps(log_entry))
-```
-
-Files to Edit:
-
-[main.py](http://main.py) - add middleware
-
-routes/[routes.py](http://routes.py) - replace print() with structured logging
-
-Acceptance Criteria:
-
-Users limited to 60 requests/minute
-
-429 returned when limit exceeded
-
-All logs include request_id and user_id
-
-Logs are JSON-formatted
-
-Phase 7: Tests
-
-Goal: Comprehensive pytest coverage.
-
-Files to Create:
-
-tests/[conftest.py](http://conftest.py) - fixtures (test DB, client, auth tokens)
-
-tests/test_[auth.py](http://auth.py) - register, login, JWT validation
-
-tests/test_resume_[crud.py](http://crud.py) - create, list, get, delete resumes
-
-tests/test_[generation.py](http://generation.py) - LLM generation flow
-
-tests/test_[idempotency.py](http://idempotency.py) - idempotency key behavior
-
-tests/test_[pagination.py](http://pagination.py) - pagination edge cases
-
-tests/test_rate_[limit.py](http://limit.py) - rate limiting
-
-Test DB Setup:
-
-# tests/[conftest.py](http://conftest.py)
-
-import pytest
-
-from sqlalchemy import create_engine
-
-from sqlalchemy.orm import sessionmaker
-
-from db.base import Base
-
-from main import app
-
-from db.session import get_db
-
-TEST_DATABASE_URL = "postgresql://test:[test@localhost:5432](mailto:test@localhost:5432)/test_resume_builder"
-
-@pytest.fixture(scope="session")
-
-def engine():
-
-```
-engine = create_engine(TEST_DATABASE_URL)
-
-Base.metadata.create_all(bind=engine)
-
-yield engine
-
-Base.metadata.drop_all(bind=engine)
-```
-
-@pytest.fixture
-
-def db_session(engine):
-
-```
-Session = sessionmaker(bind=engine)
-
-session = Session()
-
-yield session
-
-session.rollback()
-
-session.close()
-```
-
-@pytest.fixture
-
-def client(db_session):
-
-```
-def override_get_db():
-
-    yield db_session
-
-app.dependency_overrides[get_db] = override_get_db
-
-from httpx import AsyncClient, ASGITransport
-
-return AsyncClient(transport=ASGITransport(app=app), base_url="[http://test](http://test)")
-```
-
-@pytest.fixture
-
-def auth_token(client, db_session):
-
-```
-# Register + login
-
-response = [client.post](http://client.post)("/api/auth/register", json={...})
-
-response = [client.post](http://client.post)("/api/auth/login", json={...})
-
-return response.json()["access_token"]
-```
-
-Acceptance Criteria:
-
-All tests pass
-
-Coverage >80% on routes/services/repositories
-
-Tests run against isolated test DB
-
-CI-ready (can run in GitHub Actions)
-
-Phase 8: Deployment Readiness
-
-Goal: Dockerize and document deployment.
-
-Files to Create:
-
-Dockerfile - multi-stage build
-
-docker-compose.yml - app + postgres
-
-.env.example - template for env vars
-
-docs/[DEPLOYMENT.md](http://DEPLOYMENT.md) - runbook
-
-Dockerfile:
-
-FROM python:3.10-slim as builder
-
-WORKDIR /app
-
-RUN pip install poetry
-
-COPY pyproject.toml poetry.lock ./
-
-RUN poetry export -f requirements.txt -o requirements.txt --without-hashes
-
-FROM python:3.10-slim
-
-WORKDIR /app
-
-COPY --from=builder /app/requirements.txt .
-
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-docker-compose.yml:
-
-version: '3.8'
-
-services:
-
-  db:
-
-```
-image: postgres:15
-
-environment:
-
-  POSTGRES_USER: resume_user
-
-  POSTGRES_PASSWORD: resume_pass
-
-  POSTGRES_DB: resume_builder
-
-volumes:
-
-  - postgres_data:/var/lib/postgresql/data
-
-ports:
-
-  - "5432:5432"
-```
-
-  app:
-
-```
-build: .
-
-environment:
-
-  DATABASE_URL: postgresql://resume_user:resume_pass@db:5432/resume_builder
-
-  OPENAI_API_KEY: ${OPENAI_API_KEY}
-
-  JWT_SECRET: ${JWT_SECRET}
-
-ports:
-
-  - "8000:8000"
-
-depends_on:
-
-  - db
-```
-
-volumes:
-
-  postgres_data:
-
-.env.example:
-
-DATABASE_URL=postgresql://user:[pass@localhost:5432](mailto:pass@localhost:5432)/resume_builder
-
-OPENAI_API_KEY=sk-...
-
-JWT_SECRET=your-secret-key-min-32-chars
-
-JWT_ALGORITHM=HS256
-
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-
-API_HOST=0.0.0.0
-
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_MODEL=gpt-4o-mini
+APP_API_KEY=your-app-api-key-here
+API_HOST=127.0.0.1
 API_PORT=8000
-
 DEBUG=False
+DATABASE_URL=
+```
 
-Acceptance Criteria:
+#### A.6 -- README Refresh (required)
 
-docker-compose up starts app + DB
+Rewrite [README.md](README.md) to accurately reflect current state:
 
-alembic upgrade head runs migrations
+- Project purpose and stack
+- Architecture: validate vs generate split, why they are separate
+- Endpoint reference with methods, paths, auth requirements, and response shapes
+- Environment variables table (sourced from `.env.example`)
+- Local setup instructions (clone, install, `.env`, run)
+- Test execution instructions (`pytest -v`)
+- Example curl requests and abbreviated responses for `/validate` and `/generate`
+- Current project status (remove the stale "AI service needs implementation" line)
 
-App serves requests on port 8000
+#### A.7 -- Documentation Cleanup (required)
 
-Health check passes
+- **A.7.1** Rewrite or delete [tests/README.md](tests/README.md) -- remove references to `test_models.py`, `test_validations.py`, `test_api.py`. Replace with the actual test file list and a one-liner on how to run them.
+- **A.7.2** Rewrite or delete [scripts/README.md](scripts/README.md) -- remove references to scripts that do not exist. If no scripts exist, delete the file and the empty `scripts/` directory.
+- **A.7.3** Update [docs/README.md](docs/README.md) to mention the `APP_API_KEY` requirement on `/generate` and confirm current endpoint paths.
 
-C) Minimal Changes Diff Strategy
+#### A.8 -- Logging Review (required, low effort)
 
-Priority 1: Non-Breaking Foundation
+- No `print()` statements exist (verified). Only one `logger.exception()` call in `routes/routes.py`.
+- Consider adding `logger.info()` calls at the top of each route handler for request tracing (optional). At minimum, confirm current state is clean and move on.
 
-Add db/ folder structure - no existing code touched
+#### A.9 -- Optional: Readiness Endpoint (nice-to-have)
 
-Add alembic/ migrations - no existing code touched
+- Add `GET /api/ready` that checks whether `OPENAI_API_KEY` and `APP_API_KEY` are configured and returns `{"ready": true/false}`. Distinct from `/api/health` which is always-200.
+- Not required for Milestone A completion.
 
-Update [config.py](http://config.py) to add JWT/DB settings - existing settings preserved
+#### Milestone A -- Definition of Done
 
-Add new routes in separate routes/[auth.py](http://auth.py) - existing routes unchanged initially
+- All existing and new tests pass deterministically with `pytest -v`, regardless of host `.env`.
+- Auth behavior is fully covered: missing key, wrong key, correct key, unconfigured server.
+- AI success path is tested with mocking.
+- GPA truthiness bug is fixed.
+- Education silent-drop behavior is either fixed or explicitly documented.
+- Unicode normalization decision is made and documented.
+- `.env.example` exists.
+- README matches the actual codebase.
+- Stale docs are cleaned up or removed.
+- No `print()` statements in codebase (already true).
 
-Priority 2: Upgrade Existing Route
+---
 
-Refactor routes/[routes.py](http://routes.py) POST /validate:
+### MILESTONE B -- Persistence and Real Data Lifecycle
 
-Add auth dependency
+**Purpose:** Move from a stateless request/response transformation API to a stateful backend with stored data and history. This is where the project starts resembling a real product backend.
 
-Add DB session dependency
+#### B.1 -- Database Foundation
 
-Change AIService instantiation from module-level to Depends()
+- Add PostgreSQL via SQLAlchemy (async or sync, decide at implementation time).
+- Wire `DATABASE_URL` from `config.py` to engine/session creation.
+- Add `db/session.py` with `get_db` dependency.
+- Add Alembic for schema migrations.
 
-Wrap LLM call in run_in_threadpool()
+#### B.2 -- ORM Models
 
-Add repository calls before/after LLM
+Design stored entities. Likely tables:
 
-Total changed lines: ~30 lines
+- `resumes` -- stores cleaned resume data (JSONB of `ResumeOut.model_dump()`), metadata, timestamps.
+- `generations` -- stores each AI generation attempt: resume reference, model name, prompt version, output markdown, status, cost/token metadata, timestamps.
+- Relationship: one resume -> many generations.
 
-Priority 3: Add Features
+#### B.3 -- Persistence Integration
 
-Add new GET endpoints for resumes/generations
+- After `/validate` or `/generate` succeeds, persist the cleaned resume and (for `/generate`) the generation record.
+- Decide whether persistence is automatic or opt-in (e.g., a `save=true` query param or a separate `POST /api/v1/resume/save` endpoint).
 
-Add middleware (idempotency, rate limit, request ID)
+#### B.4 -- CRUD / History Endpoints
 
-Add tests
+- `GET /api/v1/resumes` -- list stored resumes (paginated).
+- `GET /api/v1/resumes/{id}` -- get a specific resume.
+- `GET /api/v1/resumes/{id}/generations` -- list generation history for a resume.
+- `DELETE /api/v1/resumes/{id}` -- delete a resume and its generations.
+- Add pagination pattern: `offset`/`limit` query params, response with `items`, `total`, `has_more`.
 
-D) Risks & Edge Cases
+#### B.5 -- Tests for Persistence
 
-Long LLM Calls
+- Test CRUD operations against a test database (SQLite or test PostgreSQL).
+- Test pagination edge cases.
 
-Risk: OpenAI calls can take 5-30 seconds, blocking the endpoint.
+#### Milestone B -- Definition of Done
 
-Mitigation: 
+- Resumes and generations are persisted to PostgreSQL.
+- Migrations run cleanly via Alembic.
+- CRUD endpoints exist and are tested.
+- Pagination works on list endpoints.
 
-Immediate: run_in_threadpool() keeps event loop responsive
+---
 
-Production: Background task queue (Celery + Redis) for async generation
+### MILESTONE C -- Reliability, Control, and Production Realism
 
-Return status='pending' immediately, poll GET /generations/{id} for result
+**Purpose:** Operational discipline for the generation workflow. Not about new features; about making the existing system more resilient and observable.
 
-PII/Security
+#### C.1 -- Idempotency for `/generate`
 
-Risk: Resumes contain sensitive data (names, emails, phone numbers).
-
-Mitigation:
-
-Encrypt cleaned_data JSONB field at rest (PostgreSQL pgcrypto)
-
-Never log resume content - only IDs and metadata
-
-Add GDPR-compliant data export/deletion endpoints
-
-Rate limit aggressively to prevent scraping
-
-Migration from Current State
-
-Risk: No existing data to migrate (currently stateless).
-
-Strategy:
-
-Start fresh with empty DB
-
-Phase 2: If needed, add import endpoint to bulk-load historical data
-
-Cost Control
-
-Risk: LLM calls cost money; abuse could be expensive.
-
-Mitigation:
-
-Rate limiting (60 req/min per user)
-
-Idempotency prevents duplicate charges
-
-Store cost_usd in generations table for monitoring
-
-Add admin endpoint to view per-user costs
-
-Database Connection Pooling
-
-Risk: Each request creating new DB connection is slow.
-
-Mitigation:
-
-SQLAlchemy engine with pool_size=20, max_overflow=10
-
-Use get_db() dependency pattern with proper cleanup
-
-E) Prioritized Checklist (Top 10)
-
-Task
-
-Complexity
-
-Files Affected
-
-Priority
-
-1
-
-Add SQLAlchemy models + Alembic migration
-
-M
-
-db/, alembic/, [config.py](http://config.py)
-
-P0
-
-2
-
-Add auth routes (register/login) + JWT service
-
-M
-
-routes/[auth.py](http://auth.py), services/auth_[service.py](http://service.py), dependencies/[auth.py](http://auth.py)
-
-P0
-
-3
-
-Refactor POST /validate with DB persistence
-
-L
-
-routes/[routes.py](http://routes.py), add repositories
-
-P0
-
-4
-
-Add resume CRUD endpoints (list, get, delete)
-
-M
-
-routes/[routes.py](http://routes.py)
-
-P1
-
-5
-
-Add idempotency middleware
-
-M
-
-middleware/[idempotency.py](http://idempotency.py), [main.py](http://main.py)
-
-P1
-
-6
-
-Add pagination to list endpoints
-
-S
-
-routes/[routes.py](http://routes.py), schemas/[pagination.py](http://pagination.py)
-
-P1
-
-7
-
-Add rate limiting middleware
-
-S
-
-middleware/rate_[limit.py](http://limit.py), [main.py](http://main.py)
-
-P2
-
-8
-
-Replace print() with structured logging
-
-S
-
-All routes, add utils/[logging.py](http://logging.py)
-
-P2
-
-9
-
-Write comprehensive tests
-
-L
-
-tests/ (8 test files)
-
-P2
-
-10
-
-Create Dockerfile + docker-compose
-
-S
-
-Dockerfile, docker-compose.yml, .env.example
-
-P3
-
-Complexity Legend: S = Small (1-2 hours), M = Medium (3-6 hours), L = Large (1-2 days)
-
-Total Estimated Effort: 5-7 days (single developer)
-
-Next Steps
-
-Confirm this plan aligns with your requirements
-
-I'll implement Phase 1 (Database Foundation) first
-
-Each phase will be a separate commit for clean history
-
-Tests will be added incrementally per phase
-
-Note: The old TODO items for writing basic tests are superseded by this comprehensive plan. The new test suite in Phase 7 will cover auth, CRUD, generation, idempotency, and pagination - far beyond the original scope.
+- Accept an `Idempotency-Key` header on `POST /generate`.
+- If a key has been seen before with the same request body, return the cached response instead of calling OpenAI again.
+- If the same key is sent with a different body, return `409 Conflict`.
+- Store idempotency records with a TTL (e.g., 24 hours).
+- This prevents duplicate billable generation on retries.
+
+#### C.2 -- Rate Limiting
+
+- Per-client rate limiting on `/generate` (in-memory initially, Redis in production).
+- Return `429 Too Many Requests` when exceeded.
+- Exempt health/ready endpoints.
+
+#### C.3 -- Observability
+
+- Structured JSON logging (replace basic `logging.basicConfig` with a JSON formatter).
+- Log request IDs for tracing.
+- Track request counts, latency, and error rates (at minimum via logs; optionally via Prometheus metrics).
+- Track generation failures and costs.
+
+#### C.4 -- Error Handling Hardening
+
+- Review all `HTTPException` raises for consistent detail messages.
+- Ensure no internal state or stack traces leak in any error response.
+- Add input validation for pagination params, path params, and headers.
+
+#### Milestone C -- Definition of Done
+
+- Duplicate `/generate` calls with the same idempotency key do not produce duplicate OpenAI charges.
+- Rate limiting is enforced.
+- Logs are structured JSON with request IDs.
+- Generation success/failure is visible in logs/metrics.
+
+---
+
+### Future / Not In Current Scope
+
+These are intentionally deferred and should not be started before Milestones A-C are complete:
+
+- **JWT / user authentication** -- required when a real frontend or public product exists; replaces `APP_API_KEY`.
+- **PDF generation** -- populating `ai_resume_pdf_url` in `ResumeOut`; requires a PDF rendering pipeline.
+- **Dockerization** -- `Dockerfile` and `docker-compose.yml` for local and deployment use.
+- **CI/CD** -- GitHub Actions for test, lint, type-check on PR.
+- **Cloud deployment** -- hosting on a cloud provider.
+- **Multiple resume templates** -- different prompt/formatting strategies.
+- **SaaS features** -- user accounts, billing, quotas, team workspaces.
+
+---
+
+## 6. Milestone A -- Recommended Execution Order
+
+This is the sequencing for immediate next work:
+
+1. **Create `tests/conftest.py`** with a fixture that sets `config.settings.APP_API_KEY` and `config.settings.OPENAI_API_KEY` to known test values. This unblocks all subsequent test work.
+2. **Fix existing `test_generate_auth.py`** to use the fixture. Confirm it passes deterministically.
+3. **Add wrong-key test** -- `X-API-Key: wrong-value` -> `401`.
+4. **Add validate-open test** -- `POST /validate` with no API key -> `200`.
+5. **Add APP_API_KEY-unconfigured test** -- set `APP_API_KEY=None` in fixture, hit `/generate` -> `503`.
+6. **Add OPENAI_API_KEY-unconfigured test** -- mock or clear OpenAI key, hit `/generate` -> `503`.
+7. **Add mocked AI success test** -- override `get_ai_service` dependency to return a mock, send valid payload with correct key -> `200` with `ai_resume_markdown`.
+8. **Add mocked AI failure test** -- mock raises exception -> `503`.
+9. **Fix GPA truthiness bug** in `validations/education.py`.
+10. **Decide education silent-drop behavior** and implement (add warning or raise 422).
+11. **Decide Unicode normalization** for `clean_text()` and document the decision.
+12. **Create `.env.example`**.
+13. **Rewrite `README.md`**.
+14. **Clean up stale docs** (`tests/README.md`, `scripts/README.md`, `docs/README.md`).

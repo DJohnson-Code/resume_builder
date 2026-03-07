@@ -5,10 +5,11 @@ from models import EducationIn, EducationOut
 from utils import title_case, first_of_month
 
 
-def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
+def clean_education(items: Optional[List[EducationIn]]) -> tuple[list[EducationOut], list[str]]:
     if not items:
-        return []
+        return [], []
     out: List[EducationOut] = []
+    warnings: list[str] = []
 
     for education in items:
         school = title_case(education.school) or ""
@@ -21,9 +22,11 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
             else None
         )
 
-        gpa = education.gpa if education.gpa else None
+        gpa = education.gpa if education.gpa is not None else None
 
-        if school and sd:
+        if not school:
+            warnings.append("Education entry skipped: missing school.")
+        else:
             out.append(
                 EducationOut(
                     school=school,
@@ -33,6 +36,5 @@ def clean_education(items: Optional[List[EducationIn]]) -> List[EducationOut]:
                     gpa=gpa,
                 )
             )
-
-    return out
+    return out, warnings
 
