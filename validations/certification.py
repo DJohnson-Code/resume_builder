@@ -27,7 +27,8 @@ def clean_certifications(
             raise HTTPException(status_code=422, detail="Certification name required.")
         if not issuer:
             raise HTTPException(status_code=422, detail="Certification issuer required.")
-
+        if issue_date and expiry_date and issue_date >= expiry_date: 
+            raise HTTPException(status_code=422, detail="Expiration date can not be before issue date.") 
         
         out.append(
             CertificationOut(
