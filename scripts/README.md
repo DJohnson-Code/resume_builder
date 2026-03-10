@@ -1,21 +1,10 @@
 # Scripts
 
-This directory contains utility scripts for the resume builder application.
+This directory currently contains placeholder PowerShell script files for local development helpers.
 
-## Available Scripts
+## Current Files
 
-- `setup.sh` / `setup.bat` - Initial project setup
-- `deploy.sh` / `deploy.bat` - Deployment scripts
-- `backup.sh` / `backup.bat` - Backup utilities
-- `migrate.py` - Database migration scripts (if needed)
+- `run_dev.ps1`
+- `test.ps1`
 
-## Usage
-
-```bash
-# Windows
-scripts\setup.bat
-
-# Unix/Linux/Mac
-chmod +x scripts/setup.sh
-./scripts/setup.sh
-```
+These files exist in the repo, but they are currently empty and do not implement setup, deploy, backup, or migration workflows.

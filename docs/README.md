@@ -28,10 +28,14 @@ User Input (JSON) → Pydantic Validation → Cleaning/Normalization → ResumeO
 Health check. Returns `{"status": "ok"}`.
 
 ### `POST /api/v1/resume/validate`
-Accepts raw resume JSON and returns cleaned/validated output.
+Accepts raw resume JSON and returns cleaned/validated output. No API key required.
 
 ### `POST /api/v1/resume/generate`
 Accepts raw resume JSON, validates/cleans it, and generates AI-enhanced markdown.
+Requires:
+- `OPENAI_API_KEY` configured on the server
+- `APP_API_KEY` configured on the server
+- `X-API-Key` request header matching `APP_API_KEY`
 
 **Request body**: `ResumeIn` schema
 **Response**: `ResumeOut` schema with cleaned data + `ai_resume_markdown`
@@ -50,6 +54,7 @@ Accepts raw resume JSON, validates/cleans it, and generates AI-enhanced markdown
 |----------|---------|-------------|
 | `OPENAI_API_KEY` | — | Required for AI generation |
 | `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model to use |
+| `APP_API_KEY` | — | Required to access `POST /api/v1/resume/generate` |
 | `API_HOST` | `127.0.0.1` | Server host |
 | `API_PORT` | `8000` | Server port |
 
@@ -61,6 +66,7 @@ poetry install
 
 # Set environment variables
 export OPENAI_API_KEY="your-key-here"
+export APP_API_KEY="your-app-key-here"
 
 # Start server
 uvicorn main:app --reload

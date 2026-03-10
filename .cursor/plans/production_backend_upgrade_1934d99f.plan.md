@@ -41,6 +41,9 @@ todos:
   - id: a6-readme
     content: Rewrite README.md to match current codebase
     status: pending
+  - id: a6-readme-scope
+    content: Clarify the roles of README.md and docs/README.md so they do not overlap
+    status: pending
   - id: a7-stale-docs
     content: Clean up or remove stale tests/README.md, scripts/README.md, update docs/README.md
     status: pending
@@ -189,6 +192,7 @@ Rewrite [README.md](README.md) to accurately reflect current state:
 - Test execution instructions (`pytest -v`)
 - Example curl requests and abbreviated responses for `/validate` and `/generate`
 - Current project status (remove the stale "AI service needs implementation" line)
+- Clarify that `README.md` is the concise repo overview while [docs/README.md](docs/README.md) holds deeper technical documentation to avoid duplication
 
 #### A.7 -- Documentation Cleanup (required)
 
