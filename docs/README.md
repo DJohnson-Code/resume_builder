@@ -1,10 +1,10 @@
 # Documentation
 
-This directory contains documentation for the Resume Builder API.
+This directory contains deeper technical documentation for the Resume Builder API.
 
 ## Project Overview
 
-A FastAPI-based REST API that validates, cleans, and AI-enhances resume data for software engineers and technical roles.
+The root [README.md](../README.md) is the quick-start guide. This document focuses on architecture, module responsibilities, and internal request flow.
 
 ## Architecture
 
@@ -40,14 +40,6 @@ Requires:
 **Request body**: `ResumeIn` schema
 **Response**: `ResumeOut` schema with cleaned data + `ai_resume_markdown`
 
-## Data Flow
-
-1. **Input Validation**: Pydantic validates `ResumeIn` (types, required fields, patterns)
-2. **Cleaning**: `clean_and_validate_resume()` normalizes all fields
-3. **Prompt Building**: `build_resume_prompt()` formats data for LLM
-4. **AI Generation**: `AIService` sends prompt to OpenAI
-5. **Response**: Returns `ResumeOut` with cleaned data and AI-generated markdown
-
 ## Environment Variables
 
 | Variable | Default | Description |
@@ -72,18 +64,25 @@ export APP_API_KEY="your-app-key-here"
 uvicorn main:app --reload
 ```
 
-## Testing
+## Request Flow
+
+1. **Input Validation**: Pydantic validates `ResumeIn` (types, required fields, patterns)
+2. **Cleaning**: `clean_and_validate_resume()` normalizes all fields
+3. **Auth Check**: `/generate` runs `verify_api_key` before AI generation
+4. **Prompt Building**: `build_resume_prompt()` formats data for the model
+5. **AI Generation**: `AIService` calls the OpenAI Responses API
+6. **Response**: Returns `ResumeOut` with cleaned data and optional AI output
+
+## Testing Notes
 
 ```bash
-# Run all tests
-pytest
-
-# Run with verbose output
-pytest -v
+poetry run pytest -v
 ```
 
-## Status
+Current tests cover health, route versioning, and part of the `/generate` auth path. Additional auth and mocked AI-path tests are still planned.
 
-- ✅ Models and validation complete
-- ✅ Prompt builder complete
-- ✅ Versioned resume routes at `/api/v1/resume/*`
+## Notes
+
+- `clean_text()` now preserves Unicode text via NFC normalization while still stripping some supplementary-plane emoji.
+- Education cleaning now emits warnings instead of silently dropping missing-school entries.
+- Certification validation rejects invalid issue/expiry ordering when both dates are present.
