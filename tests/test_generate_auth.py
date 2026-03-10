@@ -4,7 +4,7 @@ from httpx import ASGITransport, AsyncClient
 from main import app  
 
 @pytest.mark.asyncio
-async def test_generate_missing_api_key_returns_401(): 
+async def test_generate_missing_api_key_returns_401(fixed_api_keys):
     """Verify /generate rejects missing X-API-Key."""
 
     payload = {
