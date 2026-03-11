@@ -27,4 +27,3 @@ class CertificationOut(CertificationBase):
     @field_serializer("issue_date", "expiry_date")
     def _ym(self, v: date | None, _info) -> str | None:
         return None if v is None else v.strftime("%Y-%m")
-

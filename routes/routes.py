@@ -41,7 +41,7 @@ async def verify_api_key(x_api_key: str | None = Header(default=None)) -> None:
 async def validate_resume_route(payload: ResumeIn) -> ResumeOut:
     return clean_and_validate_resume(payload)
 
-
+    
 @router.post("/generate", response_model=ResumeOut)
 async def generate_resume_route(
     payload: ResumeIn,

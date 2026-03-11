@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, Integer, String, Text, func, ForeignKey, Enum as SQLEnum
+from sqlalchemy import DateTime, String, Text, func, ForeignKey, Enum as SQLEnum
 import uuid
 import enum
 
@@ -18,7 +18,7 @@ class GenerationStatus(str, enum.Enum):
 class ResumeRecord(Base):
     __tablename__ = "resumes"
 
-    id: Mapped[uuid.UUID] = mapped_column (
+    id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), 
         primary_key=True, 
         default=uuid.uuid4, 
