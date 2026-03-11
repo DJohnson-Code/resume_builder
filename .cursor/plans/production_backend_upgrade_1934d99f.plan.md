@@ -3,17 +3,17 @@ name: Resume Builder Build Plan
 overview: Replace the stale production upgrade plan with an accurate, milestone-phased engineering build plan reflecting current codebase state, completed work, known issues, and the A/B/C roadmap.
 todos:
   - id: a1-conftest
-    content: Create tests/conftest.py with fixture to control config.settings (APP_API_KEY, OPENAI_API_KEY) for deterministic tests
-    status: pending
+    content: ~~Create tests/conftest.py with fixture to control config.settings (APP_API_KEY, OPENAI_API_KEY) for deterministic tests~~
+    status: completed
   - id: a1-fix-auth-test
-    content: Fix existing test_generate_auth.py to use conftest fixture, verify deterministic 401
-    status: pending
+    content: ~~Fix existing test_generate_auth.py to use conftest fixture, verify deterministic 401~~
+    status: completed
   - id: a1-wrong-key
     content: "Add test: wrong X-API-Key -> 401"
     status: pending
   - id: a1-validate-open
-    content: "Add test: /validate with no API key -> 200"
-    status: pending
+    content: "~~Add test: /validate with no API key -> 200~~"
+    status: completed
   - id: a1-app-key-unset
     content: "Add test: APP_API_KEY=None -> 503 on /generate"
     status: pending
@@ -27,26 +27,26 @@ todos:
     content: "Add mocked AI failure test: mock raises -> 503"
     status: pending
   - id: a3-gpa-bug
-    content: Fix GPA truthiness bug in validations/education.py (0.0 treated as None)
-    status: pending
+    content: ~~Fix GPA truthiness bug in validations/education.py (0.0 treated as None)~~
+    status: completed
   - id: a3-edu-drop
-    content: Decide and implement education silent-drop behavior (warn or raise 422)
-    status: pending
+    content: ~~Decide and implement education silent-drop behavior (warn or raise 422)~~
+    status: completed
   - id: a4-unicode
-    content: Decide clean_text() Unicode handling and document the decision
-    status: pending
+    content: ~~Decide clean_text() Unicode handling and document the decision~~
+    status: completed
   - id: a5-env-example
     content: Create .env.example with all required/optional env vars
     status: pending
   - id: a6-readme
-    content: Rewrite README.md to match current codebase
-    status: pending
+    content: ~~Rewrite README.md to match current codebase~~
+    status: completed
   - id: a6-readme-scope
-    content: Clarify the roles of README.md and docs/README.md so they do not overlap
-    status: pending
+    content: ~~Clarify the roles of README.md and docs/README.md so they do not overlap~~
+    status: completed
   - id: a7-stale-docs
-    content: Clean up or remove stale tests/README.md, scripts/README.md, update docs/README.md
-    status: pending
+    content: ~~Clean up or remove stale tests/README.md, scripts/README.md, update docs/README.md~~
+    status: completed
 isProject: false
 ---
 
@@ -114,18 +114,18 @@ tests/                         # Async endpoint tests (pytest + httpx + ASGITran
 ## 4. Known Issues and Risks
 
 
-| ID       | Location                                                         | Issue                                                                                                                                               | Severity         |
-| -------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| BUG-1    | [validations/education.py](validations/education.py) line 24     | `education.gpa if education.gpa else None` treats `0.0` as falsy, turning a valid GPA into `None`                                                   | Medium           |
-| BUG-2    | [validations/education.py](validations/education.py) lines 26-35 | Entries missing `school` or `start_date` are silently dropped with no warning or error                                                              | Medium           |
-| RISK-1   | [utils/utils.py](utils/utils.py) lines 23-25                     | `clean_text()` NFKD-normalizes to ASCII, stripping accents and non-Latin characters. Lossy for names like "Rene" (from "Rene"), schools, and cities | Medium           |
-| RISK-2   | [validations/certification.py](validations/certification.py)     | No check that `expiry_date >= issue_date`                                                                                                           | Low              |
-| RISK-3   | [tests/test_generate_auth.py](tests/test_generate_auth.py)       | Test expects `401` for missing key, but gets `503` if `APP_API_KEY` is unset in env. Test is environment-sensitive                                  | High (blocks CI) |
-| STALE-1  | [README.md](README.md) line 154                                  | Says "AI service needs OpenAI call implementation" -- already implemented                                                                           | Low              |
-| STALE-2  | [tests/README.md](tests/README.md)                               | References `test_models.py`, `test_validations.py`, `test_api.py` -- none exist                                                                     | Low              |
-| STALE-3  | [scripts/README.md](scripts/README.md)                           | References `setup.sh`, `deploy.sh`, `backup.sh`, `migrate.py` -- none exist                                                                         | Low              |
-| UNUSED-1 | [utils/utils.py](utils/utils.py) `clean_date()`                  | Defined but never called in current flow; Pydantic handles date parsing                                                                             | Low              |
-| UNUSED-2 | [models/resume.py](models/resume.py) `ai_resume_pdf_url`         | Placeholder field, never populated                                                                                                                  | Low              |
+| ID          | Location                                                             | Issue                                                                                                                                                   | Severity             |
+| ----------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| ~~BUG-1~~   | ~~[validations/education.py](validations/education.py) line 24~~     | ~~`education.gpa if education.gpa else None` treats `0.0` as falsy, turning a valid GPA into `None`~~                                                   | ~~Medium~~           |
+| ~~BUG-2~~   | ~~[validations/education.py](validations/education.py) lines 26-35~~ | ~~Entries missing `school` or `start_date` are silently dropped with no warning or error~~                                                              | ~~Medium~~           |
+| ~~RISK-1~~  | ~~[utils/utils.py](utils/utils.py) lines 23-25~~                     | ~~`clean_text()` NFKD-normalizes to ASCII, stripping accents and non-Latin characters. Lossy for names like "Rene" (from "Rene"), schools, and cities~~ | ~~Medium~~           |
+| ~~RISK-2~~  | ~~[validations/certification.py](validations/certification.py)~~     | ~~No check that `expiry_date >= issue_date`~~                                                                                                           | ~~Low~~              |
+| ~~RISK-3~~  | ~~[tests/test_generate_auth.py](tests/test_generate_auth.py)~~       | ~~Test expects `401` for missing key, but gets `503` if `APP_API_KEY` is unset in env. Test is environment-sensitive~~                                  | ~~High (blocks CI)~~ |
+| ~~STALE-1~~ | ~~[README.md](README.md) line 154~~                                  | ~~Says "AI service needs OpenAI call implementation" -- already implemented~~                                                                           | ~~Low~~              |
+| ~~STALE-2~~ | ~~[tests/README.md](tests/README.md)~~                               | ~~References `test_models.py`, `test_validations.py`, `test_api.py` -- none exist~~                                                                     | ~~Low~~              |
+| ~~STALE-3~~ | ~~[scripts/README.md](scripts/README.md)~~                           | ~~References `setup.sh`, `deploy.sh`, `backup.sh`, `migrate.py` -- none exist~~                                                                         | ~~Low~~              |
+| UNUSED-1    | [utils/utils.py](utils/utils.py) `clean_date()`                      | Defined but never called in current flow; Pydantic handles date parsing                                                                                 | Low                  |
+| UNUSED-2    | [models/resume.py](models/resume.py) `ai_resume_pdf_url`             | Placeholder field, never populated                                                                                                                      | Low                  |
 
 
 ---
@@ -142,11 +142,11 @@ tests/                         # Async endpoint tests (pytest + httpx + ASGITran
 
 Make all tests reproducible regardless of host environment by controlling `settings` values inside tests.
 
-- **A.1.1** Create `tests/conftest.py` with a fixture that patches `config.settings` attributes (specifically `APP_API_KEY` and `OPENAI_API_KEY`) so tests do not depend on the host `.env`.
-- **A.1.2** Fix existing `test_generate_auth.py` -- set `APP_API_KEY` to a known value in the test fixture, then assert `401` for missing key. This resolves RISK-3.
+- **A.1.1** ~~Create `tests/conftest.py` with a fixture that patches `config.settings` attributes (specifically `APP_API_KEY` and `OPENAI_API_KEY`) so tests do not depend on the host `.env`.~~
+- **A.1.2** ~~Fix existing `test_generate_auth.py` -- set `APP_API_KEY` to a known value in the test fixture, then assert `401` for missing key. This resolves RISK-3.~~
 - **A.1.3** Add test: wrong `X-API-Key` header -> `401`.
 - **A.1.4** Add test: `APP_API_KEY` not configured (set to `None`) -> `503`.
-- **A.1.5** Add test: `/validate` remains open without any API key -> `200`.
+- **A.1.5** ~~Add test: `/validate` remains open without any API key -> `200`.~~
 - **A.1.6** Add test: missing `OPENAI_API_KEY` on `/generate` path -> `503` (exercises `get_ai_service` raising).
 
 #### A.2 -- Mocked AI Success Path Test (required)
@@ -156,15 +156,15 @@ Make all tests reproducible regardless of host environment by controlling `setti
 
 #### A.3 -- Fix Known Correctness Bugs (required)
 
-- **A.3.1** Fix GPA truthiness bug in [validations/education.py](validations/education.py) line 24. Change to `education.gpa if education.gpa is not None else None`.
-- **A.3.2** Decide on silent-drop behavior for education entries: either (a) add a warning to `ResumeOut.warnings` when an entry is dropped, or (b) raise `HTTPException(422)` for missing required fields. Recommended: add a warning and continue, consistent with the rest of the validation layer.
+- **A.3.1** ~~Fix GPA truthiness bug in [validations/education.py](validations/education.py) line 24. Change to `education.gpa if education.gpa is not None else None`.~~
+- **A.3.2** ~~Decide on silent-drop behavior for education entries: either (a) add a warning to `ResumeOut.warnings` when an entry is dropped, or (b) raise `HTTPException(422)` for missing required fields. Recommended: add a warning and continue, consistent with the rest of the validation layer.~~
 
 #### A.4 -- Normalization Decision (required -- decide, not necessarily change)
 
-- **A.4.1** Explicitly decide whether `clean_text()` should preserve Unicode or keep the current ASCII transliteration. The current behavior is lossy for accented characters. Options:
-  - (a) Keep ASCII-only and document this as an intentional constraint for ATS compatibility.
-  - (b) Switch to Unicode-preserving: remove the `.encode("ascii","ignore")` line, keep only emoji stripping and whitespace collapse.
-- **A.4.2** Whatever the decision, add a brief comment in `utils/utils.py` documenting the rationale so future contributors do not re-raise the question.
+- **A.4.1** ~~Explicitly decide whether `clean_text()` should preserve Unicode or keep the current ASCII transliteration. The current behavior is lossy for accented characters. Options:~~
+  - ~~(a) Keep ASCII-only and document this as an intentional constraint for ATS compatibility.~~
+  - ~~(b) Switch to Unicode-preserving: remove the `.encode("ascii","ignore")` line, keep only emoji stripping and whitespace collapse.~~
+- **A.4.2** ~~Whatever the decision, add a brief comment in `utils/utils.py` documenting the rationale so future contributors do not re-raise the question.~~
 
 #### A.5 -- `.env.example` (required)
 
@@ -182,23 +182,23 @@ DATABASE_URL=
 
 #### A.6 -- README Refresh (required)
 
-Rewrite [README.md](README.md) to accurately reflect current state:
+~~Rewrite [README.md](README.md) to accurately reflect current state:~~
 
-- Project purpose and stack
-- Architecture: validate vs generate split, why they are separate
-- Endpoint reference with methods, paths, auth requirements, and response shapes
-- Environment variables table (sourced from `.env.example`)
-- Local setup instructions (clone, install, `.env`, run)
-- Test execution instructions (`pytest -v`)
-- Example curl requests and abbreviated responses for `/validate` and `/generate`
-- Current project status (remove the stale "AI service needs implementation" line)
-- Clarify that `README.md` is the concise repo overview while [docs/README.md](docs/README.md) holds deeper technical documentation to avoid duplication
+- ~~Project purpose and stack~~
+- ~~Architecture: validate vs generate split, why they are separate~~
+- ~~Endpoint reference with methods, paths, auth requirements, and response shapes~~
+- ~~Environment variables table (sourced from `.env.example`)~~
+- ~~Local setup instructions (clone, install, `.env`, run)~~
+- ~~Test execution instructions (`pytest -v`)~~
+- ~~Example curl requests and abbreviated responses for `/validate` and `/generate`~~
+- ~~Current project status (remove the stale "AI service needs implementation" line)~~
+- ~~Clarify that `README.md` is the concise repo overview while [docs/README.md](docs/README.md) holds deeper technical documentation to avoid duplication~~
 
 #### A.7 -- Documentation Cleanup (required)
 
-- **A.7.1** Rewrite or delete [tests/README.md](tests/README.md) -- remove references to `test_models.py`, `test_validations.py`, `test_api.py`. Replace with the actual test file list and a one-liner on how to run them.
-- **A.7.2** Rewrite or delete [scripts/README.md](scripts/README.md) -- remove references to scripts that do not exist. If no scripts exist, delete the file and the empty `scripts/` directory.
-- **A.7.3** Update [docs/README.md](docs/README.md) to mention the `APP_API_KEY` requirement on `/generate` and confirm current endpoint paths.
+- **A.7.1** ~~Rewrite or delete [tests/README.md](tests/README.md) -- remove references to `test_models.py`, `test_validations.py`, `test_api.py`. Replace with the actual test file list and a one-liner on how to run them.~~
+- **A.7.2** ~~Rewrite or delete [scripts/README.md](scripts/README.md) -- remove references to scripts that do not exist. If no scripts exist, delete the file and the empty `scripts/` directory.~~
+- **A.7.3** ~~Update [docs/README.md](docs/README.md) to mention the `APP_API_KEY` requirement on `/generate` and confirm current endpoint paths.~~
 
 #### A.8 -- Logging Review (required, low effort)
 
@@ -215,12 +215,12 @@ Rewrite [README.md](README.md) to accurately reflect current state:
 - All existing and new tests pass deterministically with `pytest -v`, regardless of host `.env`.
 - Auth behavior is fully covered: missing key, wrong key, correct key, unconfigured server.
 - AI success path is tested with mocking.
-- GPA truthiness bug is fixed.
-- Education silent-drop behavior is either fixed or explicitly documented.
-- Unicode normalization decision is made and documented.
+- ~~GPA truthiness bug is fixed.~~
+- ~~Education silent-drop behavior is either fixed or explicitly documented.~~
+- ~~Unicode normalization decision is made and documented.~~
 - `.env.example` exists.
-- README matches the actual codebase.
-- Stale docs are cleaned up or removed.
+- ~~README matches the actual codebase.~~
+- ~~Stale docs are cleaned up or removed.~~
 - No `print()` statements in codebase (already true).
 
 ---
@@ -329,17 +329,18 @@ These are intentionally deferred and should not be started before Milestones A-C
 
 This is the sequencing for immediate next work:
 
-1. **Create `tests/conftest.py`** with a fixture that sets `config.settings.APP_API_KEY` and `config.settings.OPENAI_API_KEY` to known test values. This unblocks all subsequent test work.
-2. **Fix existing `test_generate_auth.py`** to use the fixture. Confirm it passes deterministically.
+1. ~~**Create `tests/conftest.py`** with a fixture that sets `config.settings.APP_API_KEY` and `config.settings.OPENAI_API_KEY` to known test values. This unblocks all subsequent test work.~~
+2. ~~**Fix existing `test_generate_auth.py`** to use the fixture. Confirm it passes deterministically.~~
 3. **Add wrong-key test** -- `X-API-Key: wrong-value` -> `401`.
-4. **Add validate-open test** -- `POST /validate` with no API key -> `200`.
+4. ~~**Add validate-open test** -- `POST /validate` with no API key -> `200`.~~
 5. **Add APP_API_KEY-unconfigured test** -- set `APP_API_KEY=None` in fixture, hit `/generate` -> `503`.
 6. **Add OPENAI_API_KEY-unconfigured test** -- mock or clear OpenAI key, hit `/generate` -> `503`.
 7. **Add mocked AI success test** -- override `get_ai_service` dependency to return a mock, send valid payload with correct key -> `200` with `ai_resume_markdown`.
 8. **Add mocked AI failure test** -- mock raises exception -> `503`.
-9. **Fix GPA truthiness bug** in `validations/education.py`.
-10. **Decide education silent-drop behavior** and implement (add warning or raise 422).
-11. **Decide Unicode normalization** for `clean_text()` and document the decision.
+9. ~~**Fix GPA truthiness bug** in `validations/education.py`.~~
+10. ~~**Decide education silent-drop behavior** and implement (add warning or raise 422).~~
+11. ~~**Decide Unicode normalization** for `clean_text()` and document the decision.~~
 12. **Create `.env.example`**.
-13. **Rewrite `README.md`**.
-14. **Clean up stale docs** (`tests/README.md`, `scripts/README.md`, `docs/README.md`).
+13. ~~**Rewrite `README.md`**.~~
+14. ~~**Clean up stale docs** (`tests/README.md`, `scripts/README.md`, `docs/README.md`).~~
+
