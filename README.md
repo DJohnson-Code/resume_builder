@@ -27,26 +27,37 @@ The API accepts structured resume JSON, normalizes and validates it, and can opt
 - python-dateutil
 - Poetry
 
+### Database
+
+A PostgreSQL / SQLAlchemy async database foundation has been added. The project includes ORM models and session management in `db/` (`db/session.py`, `db/models.py`). The database layer is in place; Alembic migrations and persistence wiring (saving on validate/generate, CRUD endpoints) are the next development focus.
+
 ## Setup
 
 ```bash
 poetry install
-export OPENAI_API_KEY="your-openai-key"
-export APP_API_KEY="your-app-key"
+cp .env.example .env
+# Edit .env and fill in the required values (see Environment Variables below).
 uvicorn main:app --reload
 ```
 
 ## Environment Variables
 
+Copy the template and configure your environment:
+
+- **`DATABASE_URL`** — PostgreSQL connection string for async SQLAlchemy (e.g. `postgresql+asyncpg://user:password@localhost:5432/resumedb`). Required when using the database layer.
+- **`OPENAI_API_KEY`** — OpenAI API key; required for `POST /api/v1/resume/generate`.
+- **`APP_API_KEY`** — Client API key for authenticating requests to `/generate`.
+- **`DEBUG`** — Set to `true` for debug mode; defaults to `false`.
+
 | Variable | Default | Required | Purpose |
 |----------|---------|----------|---------|
+| `DATABASE_URL` | none | For DB layer | PostgreSQL async connection string (`postgresql+asyncpg://...`) |
 | `OPENAI_API_KEY` | none | For `/generate` | OpenAI access for resume generation |
 | `OPENAI_MODEL` | `gpt-4o-mini` | No | Model used by `AIService` |
 | `APP_API_KEY` | none | For `/generate` | Request authentication for clients calling `/generate` |
 | `API_HOST` | `127.0.0.1` | No | App host |
 | `API_PORT` | `8000` | No | App port |
 | `DEBUG` | `False` | No | Debug toggle |
-| `DATABASE_URL` | none | No | Reserved for future persistence work |
 
 ## API Endpoints
 
@@ -114,12 +125,9 @@ poetry run pytest -v
 
 ## Status
 
-- Validation pipeline implemented
-- OpenAI generation implemented
-- API versioning under `/api/v1/resume`
-- `/generate` protected by `X-API-Key`
-- Documentation refresh is in progress
-- Auth and AI-path test coverage still needs expansion
+- **Milestone A (portfolio-grade API):** Core validation pipeline, `/validate` and `/generate` endpoints, and API key protection are in place. Remaining work: expanded test coverage (mocked AI tests, config-edge tests) and final docs pass.
+- **Milestone B (persistence):** Database foundation added: async SQLAlchemy session (`db/session.py`) and ORM models for resumes and generations (`db/models.py`). Next: Alembic migrations, wiring persistence into `/validate` and `/generate`, and CRUD/history endpoints.
+- **Milestone C (production hardening):** Planned (idempotency, rate limiting, observability). Not started.
 
 ## License
 
