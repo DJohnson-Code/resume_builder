@@ -17,7 +17,8 @@ dependencies = [
     "pyap (==0.3.1)",
     "email-validator (==2.2.0)",
     "phonenumbers (==8.13.27)",
-    "openai (>=2.8.1,<3.0.0)"
+    "openai (>=2.8.1,<3.0.0)",
+    "alembic (>=1.18.4,<2.0.0)"
 ]
 
 [dependency-groups]
