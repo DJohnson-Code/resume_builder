@@ -36,8 +36,8 @@ todos:
     content: ~~Decide clean_text() Unicode handling and document the decision~~
     status: completed
   - id: a5-env-example
-    content: Create .env.example with all required/optional env vars
-    status: pending
+    content: ~~Create .env.example with all required/optional env vars~~
+    status: completed
   - id: a6-readme
     content: ~~Rewrite README.md to match current codebase~~
     status: completed
@@ -218,7 +218,7 @@ DATABASE_URL=
 - ~~GPA truthiness bug is fixed.~~
 - ~~Education silent-drop behavior is either fixed or explicitly documented.~~
 - ~~Unicode normalization decision is made and documented.~~
-- `.env.example` exists.
+- ~~`.env.example` exists.~~
 - ~~README matches the actual codebase.~~
 - ~~Stale docs are cleaned up or removed.~~
 - No `print()` statements in codebase (already true).
@@ -231,18 +231,18 @@ DATABASE_URL=
 
 #### B.1 -- Database Foundation
 
-- Add PostgreSQL via SQLAlchemy (async or sync, decide at implementation time).
-- Wire `DATABASE_URL` from `config.py` to engine/session creation.
-- Add `db/session.py` with `get_db` dependency.
-- Add Alembic for schema migrations.
+- ~~Add PostgreSQL via SQLAlchemy (async or sync, decide at implementation time).~~
+- ~~Wire `DATABASE_URL` from `config.py` to engine/session creation.~~
+- ~~Add `db/session.py` with `get_db` dependency.~~
+- ~~Add Alembic for schema migrations.~~
 
 #### B.2 -- ORM Models
 
-Design stored entities. Likely tables:
+~~Design stored entities. Likely tables:~~
 
-- `resumes` -- stores cleaned resume data (JSONB of `ResumeOut.model_dump()`), metadata, timestamps.
-- `generations` -- stores each AI generation attempt: resume reference, model name, prompt version, output markdown, status, cost/token metadata, timestamps.
-- Relationship: one resume -> many generations.
+- ~~`resumes` -- stores cleaned resume data (JSONB of `ResumeOut.model_dump()`), metadata, timestamps.~~
+- ~~`generations` -- stores each AI generation attempt: resume reference, model name, prompt version, output markdown, status, cost/token metadata, timestamps.~~
+- ~~Relationship: one resume -> many generations.~~
 
 #### B.3 -- Persistence Integration
 
@@ -340,7 +340,7 @@ This is the sequencing for immediate next work:
 9. ~~**Fix GPA truthiness bug** in `validations/education.py`.~~
 10. ~~**Decide education silent-drop behavior** and implement (add warning or raise 422).~~
 11. ~~**Decide Unicode normalization** for `clean_text()` and document the decision.~~
-12. **Create `.env.example`**.
+12. ~~**Create `.env.example`**.~~
 13. ~~**Rewrite `README.md`**.~~
 14. ~~**Clean up stale docs** (`tests/README.md`, `scripts/README.md`, `docs/README.md`).~~
 
