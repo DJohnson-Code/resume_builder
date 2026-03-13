@@ -14,8 +14,11 @@ async def create_resume(
     """Storing a cleaned version of resume in the db"""
 
     resume_record = ResumeRecord(
-        cleaned_data=resume_out.model_dump(mode="json")
-    )
+        cleaned_data=resume_out.model_dump(
+            mode="json",
+            exclude={"ok", "warnings", "ai_resume_markdown", "ai_resume_pdf_url", "ai_model"},
+            exclude_none=True,
+    ))
 
     session.add(resume_record)
     await session.flush()
