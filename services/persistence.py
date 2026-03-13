@@ -26,5 +26,22 @@ async def create_resume(
     return resume_record
 
 
-async def create_generation(session, resume_id, status, markdown_output, ai_model) -> GenerationRecord:
-    pass
+async def create_generation(
+    session: AsyncSession,
+    resume_id: UUID,
+    status: GenerationStatus, 
+    markdown_output: str | None,  
+    ai_model: str | None
+    ) -> GenerationRecord:
+    """Store an AI generation attempt"""
+    generation_record = GenerationRecord(
+        resume_id=resume_id,
+        status=status, 
+        markdown_output=markdown_output,
+        ai_model=ai_model
+    )
+
+    session.add(generation_record)
+    await session.flush()
+
+    return generation_record
