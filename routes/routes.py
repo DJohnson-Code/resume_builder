@@ -2,11 +2,12 @@ import logging
 from functools import lru_cache
 
 from fastapi import APIRouter, Depends, HTTPException, Header
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
+from db import get_db, GenerationStatus
 from models import ResumeIn, ResumeOut
-from services.ai_service import AIService
-from services.validation_service import clean_and_validate_resume
+from services import AIService, clean_and_validate_resume, create_resume, create_generation
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ async def generate_resume_route(
     payload: ResumeIn,
     ai_service: AIService = Depends(get_ai_service),
     _: None = Depends(verify_api_key),
+    db: AsyncSession = Depends(get_db)
 ) -> ResumeOut:
 
     resume_out = clean_and_validate_resume(payload)
@@ -60,6 +62,25 @@ async def generate_resume_route(
             detail="AI generation failed",
         )
 
+    try: 
+        async with db.begin():
+            resume_record = await create_resume(db, resume_out)
+
+            await create_generation(
+                db, 
+                resume_id=resume_record.id,
+                status=GenerationStatus.COMPLETED,
+                markdown_output=ai_content,
+                ai_model=settings.OPENAI_MODEL
+            )
+    except Exception: 
+        logger.exception("Database persistence failed")
+        raise HTTPException(
+            status_code=503, 
+            detail="Database persistence failed",
+        )
+
     resume_out.ai_resume_markdown = ai_content
     resume_out.ai_model = settings.OPENAI_MODEL
+    
     return resume_out
