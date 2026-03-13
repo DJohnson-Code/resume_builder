@@ -1,7 +1,7 @@
 @apikey = dev_key_123
 POST http://localhost:8000/api/v1/resume/generate
 Content-Type: application/json
-x-api-key: {{apikey}}
+x-api-key: 9f3d8a7289453
 
 {
   "name": "JoHN DOE",
