@@ -82,6 +82,13 @@ async def generate_resume_route(
             detail="Database persistence failed",
         )
 
+@router.get("/resumes", response_model=PaginatedResumesResponse)
+async def get_resumes(
+    db: AsyncSession = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100), 
+    ) -> PaginatedResumesResponse:
+
     resume_out.ai_resume_markdown = ai_content
     resume_out.ai_model = settings.OPENAI_MODEL
     return resume_out

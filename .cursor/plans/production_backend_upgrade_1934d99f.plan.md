@@ -246,8 +246,9 @@ DATABASE_URL=
 
 #### B.3 -- Persistence Integration
 
-- After `/validate` or `/generate` succeeds, persist the cleaned resume and (for `/generate`) the generation record.
-- Decide whether persistence is automatic or opt-in (e.g., a `save=true` query param or a separate `POST /api/v1/resume/save` endpoint).
+- ~~On `POST /api/v1/resume/generate`, persist the cleaned resume and the generation record.~~
+- ~~`POST /api/v1/resume/validate` remains intentionally stateless (no persistence).~~
+- ~~Persistence is automatic for `/generate` (no opt-in flag) in the current design.~~
 
 #### B.4 -- CRUD / History Endpoints
 
