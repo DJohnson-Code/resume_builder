@@ -19,8 +19,9 @@ User Input (JSON) → Pydantic Validation → Cleaning/Normalization → ResumeO
 | `models/` | Pydantic In/Out model pairs (Resume, Experience, Education, Certification, Location) |
 | `validations/` | Cleaning functions per model (phone → E.164, name title removal, date normalization) |
 | `utils/` | Shared helpers (clean_text, title_case, URL normalization, skill deduplication) |
-| `services/` | Business logic (validation orchestration, prompt building, AI service) |
+| `services/` | Business logic (validation orchestration, prompt building, AI service, persistence helpers) |
 | `routes/` | FastAPI endpoints |
+| `db/` | SQLAlchemy async session and ORM models for resumes and generations |
 
 ## API Endpoints
 
@@ -28,7 +29,10 @@ User Input (JSON) → Pydantic Validation → Cleaning/Normalization → ResumeO
 Health check. Returns `{"status": "ok"}`.
 
 ### `POST /api/v1/resume/validate`
-Accepts raw resume JSON and returns cleaned/validated output. No API key required.
+Accepts raw resume JSON and returns cleaned/validated output.
+Requires:
+- `APP_API_KEY` configured on the server
+- `X-API-Key` request header matching `APP_API_KEY`
 
 ### `POST /api/v1/resume/generate`
 Accepts raw resume JSON, validates/cleans it, and generates AI-enhanced markdown.
@@ -40,13 +44,20 @@ Requires:
 **Request body**: `ResumeIn` schema
 **Response**: `ResumeOut` schema with cleaned data + `ai_resume_markdown`
 
+### `GET /api/v1/resume/`
+Returns a paginated list of stored resumes.
+Requires:
+- `APP_API_KEY` configured on the server
+- `X-API-Key` request header matching `APP_API_KEY`
+
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `DATABASE_URL` | — | Required for the PostgreSQL async database layer |
 | `OPENAI_API_KEY` | — | Required for AI generation |
 | `OPENAI_MODEL` | `gpt-4o-mini` | OpenAI model to use |
-| `APP_API_KEY` | — | Required to access `POST /api/v1/resume/generate` |
+| `APP_API_KEY` | — | Required to access `/api/v1/resume/*` |
 | `API_HOST` | `127.0.0.1` | Server host |
 | `API_PORT` | `8000` | Server port |
 
@@ -57,6 +68,7 @@ Requires:
 poetry install
 
 # Set environment variables
+export DATABASE_URL="postgresql+asyncpg://user:password@localhost:5432/resumedb"
 export OPENAI_API_KEY="your-key-here"
 export APP_API_KEY="your-app-key-here"
 
@@ -68,10 +80,11 @@ uvicorn main:app --reload
 
 1. **Input Validation**: Pydantic validates `ResumeIn` (types, required fields, patterns)
 2. **Cleaning**: `clean_and_validate_resume()` normalizes all fields
-3. **Auth Check**: `/generate` runs `verify_api_key` before AI generation
-4. **Prompt Building**: `build_resume_prompt()` formats data for the model
-5. **AI Generation**: `AIService` calls the OpenAI Responses API
-6. **Response**: Returns `ResumeOut` with cleaned data and optional AI output
+3. **Auth Check**: All `/api/v1/resume/*` routes currently run `verify_api_key`
+4. **Prompt Building**: `/generate` uses `build_resume_prompt()` to format data for the model
+5. **AI Generation**: `AIService` calls the OpenAI Responses API for `/generate`
+6. **Persistence**: `/generate` stores the cleaned resume and generation metadata in the database; `GET /api/v1/resume/` reads paginated resume records back out
+7. **Response**: Returns `ResumeOut` with cleaned data and optional AI output, or a paginated resume list for `GET /api/v1/resume/`
 
 ## Testing Notes
 

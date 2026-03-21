@@ -89,7 +89,7 @@ class ResumeOut(BaseModel):
     ) 
 
 
-class ResumeListItem(BaseModel):
+class ResumeItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
@@ -98,7 +98,7 @@ class ResumeListItem(BaseModel):
 
 
 class PaginatedResumesResponse(BaseModel): 
-    items: list[ResumeListItem]
+    items: list[ResumeItem]
     total: int
     skip: int
     limit: int
