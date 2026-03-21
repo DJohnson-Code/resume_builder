@@ -1,6 +1,9 @@
 from __future__ import annotations
+from datetime import datetime
 from typing import Annotated
-from pydantic import BaseModel, EmailStr, HttpUrl, Field
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, Field
+from sqlalchemy import true
 
 
 from .location import LocationIn, LocationOut
@@ -85,6 +88,21 @@ class ResumeOut(BaseModel):
         default_factory=list
     ) 
 
+
+class ResumeListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class PaginatedResumesResponse(BaseModel): 
+    items: list[ResumeListItem]
+    total: int
+    skip: int
+    limit: int
+    has_more: bool
 
 ResumeIn.model_rebuild()
 ResumeOut.model_rebuild()

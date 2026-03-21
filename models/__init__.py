@@ -1,4 +1,4 @@
-from .resume import ResumeIn, ResumeOut, PhoneIn, PhoneOut
+from .resume import ResumeIn, ResumeOut, PhoneIn, PhoneOut, ResumeListItem, PaginatedResumesResponse
 from .location import LocationBase, LocationIn, LocationOut
 from .experience import ExperienceBase, ExperienceIn, ExperienceOut
 from .education import EducationBase, EducationIn, EducationOut
@@ -10,6 +10,8 @@ __all__ = [
     "ResumeOut",
     "PhoneIn",
     "PhoneOut",
+    "ResumeListItem",
+    "PaginatedResumesResponse",
     # Location
     "LocationBase",
     "LocationIn",

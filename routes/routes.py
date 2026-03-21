@@ -1,12 +1,13 @@
 import logging
 from functools import lru_cache
 
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
-from db import get_db, GenerationStatus
-from models import ResumeIn, ResumeOut
+from db import get_db, GenerationStatus, ResumeRecord
+from models import ResumeIn, ResumeOut, ResumeListItem, PaginatedResumesResponse
 from services import AIService, clean_and_validate_resume, create_resume, create_generation
 
 logger = logging.getLogger(__name__)
@@ -82,13 +83,38 @@ async def generate_resume_route(
             detail="Database persistence failed",
         )
 
-@router.get("/resumes", response_model=PaginatedResumesResponse)
-async def get_resumes(
-    db: AsyncSession = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100), 
-    ) -> PaginatedResumesResponse:
-
     resume_out.ai_resume_markdown = ai_content
     resume_out.ai_model = settings.OPENAI_MODEL
     return resume_out
+
+
+@router.get("/resumes", response_model=PaginatedResumesResponse)
+async def get_resumes(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100), 
+    db: AsyncSession = Depends(get_db),
+    ) -> PaginatedResumesResponse:
+        total_stmt = select(func.count()).select_from(ResumeRecord)
+        total_result = await db.execute(total_stmt)
+        total = total_result.scalar_one()
+
+        stmt = (
+            select(ResumeRecord)
+            .order_by(ResumeRecord.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+
+        result = await db.execute(stmt)
+        resume_records = result.scalars().all()
+
+        items = [ResumeListItem.model_validate(record) for record in resume_records]
+        has_more = skip + len(items) < total
+
+        return PaginatedResumesResponse(
+            items=items,
+            total=total,
+            skip=skip,
+            limit=limit,
+            has_more=has_more,
+        )
