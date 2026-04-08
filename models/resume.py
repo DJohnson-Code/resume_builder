@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, Field
-from sqlalchemy import true
+
 
 
 from .location import LocationIn, LocationOut
