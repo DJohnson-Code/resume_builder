@@ -63,3 +63,10 @@ tempCodeRunnerFile.py
 .env.test.local
 .env.production.local
 .gemini.md
+
+# Local AI / tooling config
+opencode.json
+AGENTS.md
+.opencode/
+session-ses_*.md
+.codex
