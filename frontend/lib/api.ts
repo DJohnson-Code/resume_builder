@@ -1,6 +1,7 @@
 // API client for Resume Builder backend
-// Configure this to point to your backend server
-export const API_BASE = "http://127.0.0.1:8000"
+// Set NEXT_PUBLIC_API_BASE in .env.local to override the default
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 
 // FastAPI 422 detail is an array of Pydantic error objects; flatten to a string
 function normalizeDetail(detail: unknown): string {

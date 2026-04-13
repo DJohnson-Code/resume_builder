@@ -25,7 +25,14 @@ class Settings:
     OPENAI_API_KEY: str | None = os.getenv("OPENAI_API_KEY")
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-    # APP KEY ONLY WHILE THIS IS BACKEND ONLY API 
+    # APP KEY ONLY WHILE THIS IS BACKEND ONLY API
     APP_API_KEY: str | None = os.getenv("APP_API_KEY")
+
+    # Comma-separated list of allowed frontend origins for CORS
+    CORS_ORIGINS: list[str] = [
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+        if origin.strip()
+    ]
 
 settings = Settings()

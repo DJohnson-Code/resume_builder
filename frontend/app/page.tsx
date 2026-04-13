@@ -106,8 +106,9 @@ export default function Home() {
                 spellCheck={false}
               />
               <p className="mt-2 text-xs text-muted-foreground">
-                Paste your JSON Resume schema. It will be sent to the backend
-                API for validation and generation.
+                Paste resume data matching the backend&apos;s ResumeIn schema
+                (name, email, phone, experience, skills, etc.). It will be
+                sent to the API for validation and generation.
               </p>
               {parseError && (
                 <p className="mt-2 text-sm text-destructive">
