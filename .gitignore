@@ -16,7 +16,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -67,6 +67,7 @@ tempCodeRunnerFile.py
 # Local AI / tooling config
 opencode.json
 AGENTS.md
+CLAUDE.md
 .opencode/
 session-ses_*.md
 .codex

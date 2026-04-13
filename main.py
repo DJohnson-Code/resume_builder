@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes.routes import router as resume_router 
 
 logging.basicConfig(
@@ -9,6 +10,14 @@ logging.basicConfig(
 )
 
 app = FastAPI(title="Resume Builder API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(resume_router)
 
