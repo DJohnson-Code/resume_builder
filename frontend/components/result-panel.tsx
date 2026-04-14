@@ -71,7 +71,7 @@ interface JsonDisplayProps {
 
 export function JsonDisplay({ data }: JsonDisplayProps) {
   return (
-    <pre className="max-h-64 overflow-auto rounded-lg border border-border/60 bg-background/70 p-3.5 text-xs leading-relaxed text-foreground/90 font-mono">
+    <pre className="scrollbar-hidden max-h-64 overflow-auto rounded-lg border border-border/60 bg-background/70 p-3.5 text-xs leading-relaxed text-foreground/90 font-mono">
       {JSON.stringify(data, null, 2)}
     </pre>
   )
@@ -83,7 +83,7 @@ interface MarkdownPreviewProps {
 
 export function MarkdownPreview({ content }: MarkdownPreviewProps) {
   return (
-    <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-border/60 bg-background/70 p-4 text-sm leading-relaxed text-foreground/90 font-mono">
+    <pre className="scrollbar-hidden max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-border/60 bg-background/70 p-4 text-sm leading-relaxed text-foreground/90 font-mono">
       {content}
     </pre>
   )

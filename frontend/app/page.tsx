@@ -212,7 +212,7 @@ export default function Home() {
                   id="json-input"
                   value={jsonInput}
                   onChange={(e) => setJsonInput(e.target.value)}
-                  className="relative h-[28rem] w-full resize-none rounded-xl bg-transparent px-5 py-4 font-mono text-[13px] leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+                  className="editor-scroll relative h-[28rem] w-full resize-none rounded-xl bg-transparent px-5 py-4 font-mono text-[13px] leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
                   placeholder="Paste your resume JSON here…"
                   spellCheck={false}
                 />
