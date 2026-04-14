@@ -7,6 +7,7 @@ interface ResultPanelProps {
   children: React.ReactNode
   className?: string
   variant?: "default" | "error" | "success"
+  meta?: string
 }
 
 export function ResultPanel({
@@ -14,27 +15,40 @@ export function ResultPanel({
   children,
   className,
   variant = "default",
+  meta,
 }: ResultPanelProps) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-card p-4",
-        variant === "error" && "border-destructive/50",
-        variant === "success" && "border-primary/50",
-        className
+        "ring-gradient relative overflow-hidden rounded-2xl bg-card/60 p-5 backdrop-blur-md transition-colors",
+        variant === "error" && "bg-destructive/[0.04]",
+        variant === "success" && "bg-accent/[0.04]",
+        className,
       )}
     >
-      <h3
-        className={cn(
-          "mb-3 text-sm font-medium uppercase tracking-wider",
-          variant === "default" && "text-muted-foreground",
-          variant === "error" && "text-destructive",
-          variant === "success" && "text-primary"
+      {/* Top edge highlight line */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent"
+      />
+      <div className="relative mb-4 flex items-baseline justify-between gap-3">
+        <h3
+          className={cn(
+            "font-mono text-[11px] uppercase tracking-[0.22em]",
+            variant === "default" && "text-muted-foreground",
+            variant === "error" && "text-destructive",
+            variant === "success" && "text-accent",
+          )}
+        >
+          {title}
+        </h3>
+        {meta && (
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
+            {meta}
+          </span>
         )}
-      >
-        {title}
-      </h3>
-      {children}
+      </div>
+      <div className="relative">{children}</div>
     </div>
   )
 }
@@ -45,7 +59,9 @@ interface EmptyStateProps {
 
 export function EmptyState({ message }: EmptyStateProps) {
   return (
-    <p className="text-sm text-muted-foreground italic">{message}</p>
+    <div className="flex min-h-[72px] items-center rounded-lg border border-dashed border-border/60 bg-background/30 px-4 py-3">
+      <p className="text-sm leading-relaxed text-muted-foreground">{message}</p>
+    </div>
   )
 }
 
@@ -55,7 +71,7 @@ interface JsonDisplayProps {
 
 export function JsonDisplay({ data }: JsonDisplayProps) {
   return (
-    <pre className="max-h-64 overflow-auto rounded bg-secondary p-3 text-xs text-foreground font-mono">
+    <pre className="max-h-64 overflow-auto rounded-lg border border-border/60 bg-background/70 p-3.5 text-xs leading-relaxed text-foreground/90 font-mono">
       {JSON.stringify(data, null, 2)}
     </pre>
   )
@@ -67,7 +83,7 @@ interface MarkdownPreviewProps {
 
 export function MarkdownPreview({ content }: MarkdownPreviewProps) {
   return (
-    <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-secondary p-3 text-sm text-foreground font-mono leading-relaxed">
+    <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-border/60 bg-background/70 p-4 text-sm leading-relaxed text-foreground/90 font-mono">
       {content}
     </pre>
   )
@@ -79,10 +95,16 @@ interface ErrorListProps {
 
 export function ErrorList({ errors }: ErrorListProps) {
   return (
-    <ul className="space-y-1">
+    <ul className="space-y-1.5">
       {errors.map((error, i) => (
-        <li key={i} className="flex items-start gap-2 text-sm text-destructive">
-          <span className="mt-0.5 text-destructive">•</span>
+        <li
+          key={i}
+          className="flex items-start gap-2.5 text-sm text-destructive/90"
+        >
+          <span
+            aria-hidden
+            className="mt-[7px] inline-block h-1 w-1 shrink-0 rounded-full bg-destructive"
+          />
           <span>{error}</span>
         </li>
       ))}
