@@ -4,42 +4,42 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Warm near-black atmosphere with layered surfaces. */
-  --background: oklch(0.085 0.004 20);
-  --foreground: oklch(0.96 0.003 40);
+  /* True matte graphite / charcoal gray — well clear of black. */
+  --background: oklch(0.275 0.004 265);
+  --foreground: oklch(0.97 0.003 260);
 
-  --card: oklch(0.115 0.006 22);
-  --card-foreground: oklch(0.96 0.003 40);
-  --popover: oklch(0.115 0.006 22);
-  --popover-foreground: oklch(0.96 0.003 40);
+  --card: oklch(0.32 0.005 265);
+  --card-foreground: oklch(0.97 0.003 260);
+  --popover: oklch(0.32 0.005 265);
+  --popover-foreground: oklch(0.97 0.003 260);
 
   /* Primary = cream pill CTA */
-  --primary: oklch(0.97 0.004 60);
-  --primary-foreground: oklch(0.12 0.005 22);
+  --primary: oklch(0.97 0.004 80);
+  --primary-foreground: oklch(0.22 0.004 265);
 
-  --secondary: oklch(0.14 0.006 22);
-  --secondary-foreground: oklch(0.92 0.003 40);
+  --secondary: oklch(0.345 0.005 265);
+  --secondary-foreground: oklch(0.95 0.003 260);
 
-  --muted: oklch(0.155 0.006 22);
-  --muted-foreground: oklch(0.62 0.012 30);
+  --muted: oklch(0.365 0.005 265);
+  --muted-foreground: oklch(0.74 0.01 260);
 
-  /* Primary accent — dusty rose (COMPUTE mood) */
-  --accent: oklch(0.78 0.12 8);
-  --accent-foreground: oklch(0.12 0.005 22);
+  /* Primary accent — dusty rose, slightly brighter to pop on graphite */
+  --accent: oklch(0.74 0.12 12);
+  --accent-foreground: oklch(0.22 0.004 265);
 
-  /* Secondary accent — electric violet for contrast/highlights */
-  --highlight: oklch(0.7 0.18 295);
+  /* Secondary accent — restrained plum/wine */
+  --highlight: oklch(0.58 0.13 350);
   --highlight-foreground: oklch(0.98 0 0);
 
-  --destructive: oklch(0.62 0.18 22);
+  --destructive: oklch(0.65 0.17 22);
   --destructive-foreground: oklch(0.98 0 0);
 
   --success: oklch(0.78 0.1 155);
-  --success-foreground: oklch(0.12 0.005 22);
+  --success-foreground: oklch(0.22 0.004 265);
 
-  --border: oklch(0.2 0.006 22);
-  --input: oklch(0.135 0.006 22);
-  --ring: oklch(0.78 0.12 8);
+  --border: oklch(0.44 0.006 265);
+  --input: oklch(0.335 0.005 265);
+  --ring: oklch(0.74 0.12 12);
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -49,14 +49,14 @@
 
   --radius: 0.875rem;
 
-  --sidebar: oklch(0.1 0.005 22);
-  --sidebar-foreground: oklch(0.92 0.003 40);
-  --sidebar-primary: oklch(0.78 0.12 8);
-  --sidebar-primary-foreground: oklch(0.12 0.005 22);
-  --sidebar-accent: oklch(0.15 0.006 22);
-  --sidebar-accent-foreground: oklch(0.92 0.003 40);
-  --sidebar-border: oklch(0.2 0.006 22);
-  --sidebar-ring: oklch(0.78 0.12 8);
+  --sidebar: oklch(0.3 0.005 265);
+  --sidebar-foreground: oklch(0.95 0.003 260);
+  --sidebar-primary: oklch(0.74 0.12 12);
+  --sidebar-primary-foreground: oklch(0.22 0.004 265);
+  --sidebar-accent: oklch(0.345 0.005 265);
+  --sidebar-accent-foreground: oklch(0.95 0.003 260);
+  --sidebar-border: oklch(0.44 0.006 265);
+  --sidebar-ring: oklch(0.74 0.12 12);
 }
 
 @theme inline {
@@ -111,16 +111,16 @@
   }
   html {
     background-color: var(--background);
-    /* Two offset glows — warm rose upper-right, cool violet lower-left. */
+    /* Two offset ambient glows — restrained for matte charcoal context. */
     background-image:
       radial-gradient(
-        ellipse 55% 45% at 88% -8%,
-        oklch(0.55 0.17 12 / 0.22),
+        ellipse 55% 45% at 90% -10%,
+        oklch(0.5 0.14 12 / 0.14),
         transparent 70%
       ),
       radial-gradient(
-        ellipse 50% 40% at 5% 95%,
-        oklch(0.45 0.18 295 / 0.18),
+        ellipse 50% 40% at 0% 100%,
+        oklch(0.4 0.13 340 / 0.1),
         transparent 70%
       );
     background-attachment: fixed;
@@ -159,10 +159,10 @@
     padding: 1px;
     background: linear-gradient(
       140deg,
-      oklch(0.78 0.12 8 / 0.35),
-      oklch(0.3 0.01 22 / 0.2) 35%,
-      oklch(0.3 0.01 22 / 0.1) 65%,
-      oklch(0.7 0.18 295 / 0.3)
+      oklch(0.74 0.12 12 / 0.35),
+      oklch(0.55 0.008 265 / 0.25) 35%,
+      oklch(0.55 0.008 265 / 0.12) 65%,
+      oklch(0.58 0.13 350 / 0.32)
     );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -172,16 +172,30 @@
     pointer-events: none;
   }
 
-  /* Horizontal marquee for storytelling ticker. */
-  .marquee-track {
-    animation: marquee 48s linear infinite;
+  /* Always-visible horizontal scrollbar for the story strip.
+     macOS hides native scrollbars by default, so we force a visible one. */
+  .scroll-visible {
+    scrollbar-width: auto;
+    scrollbar-color: oklch(0.55 0.008 265) oklch(0.32 0.005 265);
+    -webkit-overflow-scrolling: touch;
   }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+  .scroll-visible::-webkit-scrollbar {
+    height: 12px;
+    display: block;
+    -webkit-appearance: none;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; }
+  .scroll-visible::-webkit-scrollbar-track {
+    background: oklch(0.32 0.005 265);
+    border-radius: 9999px;
+    margin: 0 1rem;
+  }
+  .scroll-visible::-webkit-scrollbar-thumb {
+    background: oklch(0.55 0.008 265);
+    border-radius: 9999px;
+    border: 2px solid oklch(0.32 0.005 265);
+  }
+  .scroll-visible::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.74 0.12 12 / 0.9);
   }
 
   /* Slow pulse for scroll cue and faint glints. */

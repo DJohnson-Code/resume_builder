@@ -10,7 +10,7 @@ import {
   MarkdownPreview,
   ErrorList,
 } from "@/components/result-panel"
-import { Marquee } from "@/components/marquee"
+import { StoryScroll } from "@/components/story-scroll"
 import {
   validateResume,
   generateResume,
@@ -80,8 +80,8 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
           <a href="#top" className="flex items-baseline gap-2">
-            <span className="font-serif text-[17px] tracking-tight text-foreground">
-              Résumé<span className="italic text-accent">/</span>Builder
+            <span className="text-[15px] font-semibold tracking-tight text-foreground">
+              Resume<span className="mx-1 text-accent">/</span>Builder
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
               v1
@@ -95,7 +95,7 @@ export default function Home() {
               How it works
             </a>
             <a
-              href="https://github.com"
+              href="https://github.com/DJohnson-Code/resume_builder"
               className="transition-colors hover:text-foreground"
             >
               Docs
@@ -135,7 +135,7 @@ export default function Home() {
         </div>
 
         <h1 className="mt-9 max-w-5xl text-[15vw] font-semibold leading-[0.92] tracking-[-0.035em] text-foreground sm:text-7xl lg:text-[7.5rem]">
-          The résumé,{" "}
+          The resume,{" "}
           <span className="font-serif font-normal italic text-foreground/90">
             rewritten.
           </span>
@@ -143,7 +143,7 @@ export default function Home() {
 
         <p className="mt-9 max-w-xl text-[15px] leading-[1.7] text-muted-foreground">
           Paste your career as structured JSON. We validate it against a strict
-          schema and publish an ATS-ready markdown résumé in seconds. Built for
+          schema and publish an ATS-ready markdown resume in seconds. Built for
           people who'd rather ship than format.
         </p>
 
@@ -173,20 +173,9 @@ export default function Home() {
       </section>
 
       {/* ────────────────────────────────────────────────────────
-          MARQUEE
+          STORY — horizontally scrollable product narrative
       ──────────────────────────────────────────────────────── */}
-      <Marquee
-        items={[
-          "ATS-tuned",
-          "Structured schema",
-          "Markdown-native",
-          "Validated live",
-          "Zero lock-in",
-          "Built for developers",
-          "Powered by GPT",
-          "Ship your story",
-        ]}
-      />
+      <StoryScroll />
 
       {/* ────────────────────────────────────────────────────────
           BUILDER — centerpiece, functional
@@ -281,7 +270,7 @@ export default function Home() {
                     Generating…
                   </>
                 ) : (
-                  "Generate résumé"
+                  "Generate resume"
                 )}
               </Button>
             </div>
@@ -457,7 +446,7 @@ export default function Home() {
         <div className="border-t border-border/60">
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-6 py-6 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 md:flex-row md:items-center md:justify-between lg:px-8">
             <span className="font-mono">
-              Résumé Builder · crafted for the terminal generation
+              Resume Builder · crafted for the terminal generation
             </span>
             <span className="font-mono">127.0.0.1:8000 → 3000</span>
           </div>
