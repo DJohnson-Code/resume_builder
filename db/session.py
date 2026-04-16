@@ -1,48 +1,46 @@
 from __future__ import annotations
+from fastapi import HTTPException   
 
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from config import settings
-
 
 _engine: AsyncEngine | None = None
 _async_session_local: async_sessionmaker[AsyncSession] | None = None
 
 
-def get_engine() -> AsyncEngine:
-    global _engine
+def init_db(): 
+    global _engine, _async_session_local
 
-    if _engine is not None:
-        return _engine
-
-    if not settings.DATABASE_URL:
-        raise RuntimeError("DATABASE_URL is not configured.")
+    if _async_session_local is not None: 
+        return
+    
+    if not settings.DATABASE_URL: 
+        return 
 
     _engine = create_async_engine(settings.DATABASE_URL)
-    return _engine
 
-
-def get_sessionmaker() -> async_sessionmaker[AsyncSession]:
-    global _async_session_local
-
-    if _async_session_local is not None:
-        return _async_session_local
-
-    engine = get_engine()
     _async_session_local = async_sessionmaker(
-        engine,
+        _engine,
         class_=AsyncSession,
         expire_on_commit=False,
-    )
-    return _async_session_local
+    )   
+
+async def dispose_db(): 
+    global _engine, _async_session_local 
+
+    if _engine is not None: 
+        await _engine.dispose()
+
+    _engine = None
+    _async_session_local = None
 
 
-async def get_db():
-    try:
-        sessionmaker = get_sessionmaker()
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail="Database not configured") from exc
+async def get_db(): 
 
-    async with sessionmaker() as session:
-        yield session 
+    if _async_session_local is None: 
+        raise HTTPException(status_code=503, detail="Database not configured") 
+    
+    async with _async_session_local() as session:
+        yield session
+
