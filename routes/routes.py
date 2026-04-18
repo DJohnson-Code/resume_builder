@@ -49,9 +49,9 @@ async def validate_resume_route(
 @router.post("/generate", response_model=ResumeOut)
 async def generate_resume_route(
     payload: ResumeIn,
+    db: AsyncSession = Depends(get_db),
     ai_service: AIService = Depends(get_ai_service),
     _: None = Depends(verify_api_key),
-    db: AsyncSession = Depends(get_db)
 ) -> ResumeOut:
 
     resume_out = clean_and_validate_resume(payload)
@@ -86,7 +86,7 @@ async def generate_resume_route(
     resume_out.ai_resume_markdown = ai_content
     resume_out.ai_model = settings.OPENAI_MODEL
     return resume_out
-
+    
 
 @router.get("/", response_model=PaginatedResumesResponse)
 async def get_resumes(
