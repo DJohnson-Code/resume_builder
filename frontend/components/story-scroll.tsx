@@ -243,7 +243,7 @@ export function StoryScroll() {
       aria-label="How the builder works"
       className="relative py-20 lg:py-24"
     >
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+      <div className="mx-auto max-w-none px-6 lg:px-[clamp(2rem,4vw,4.5rem)] xl:px-[clamp(3rem,6vw,6rem)]">
         <div className="flex items-end justify-between gap-6">
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
@@ -251,9 +251,9 @@ export function StoryScroll() {
               <span className="h-px w-8 bg-muted-foreground/40" />
               <span className="font-mono">The story</span>
             </div>
-            <h2 className="mt-5 text-3xl font-semibold leading-[1.05] tracking-[-0.02em] text-foreground md:text-4xl lg:text-[2.75rem]">
+            <h2 className="mt-5 font-serif text-3xl font-normal leading-[1.05] tracking-[-0.02em] text-foreground md:text-4xl lg:text-[2.75rem]">
               From messy PDF to{" "}
-              <span className="font-serif italic text-muted-foreground/90">
+              <span className="italic text-muted-foreground/90">
                 shippable markdown.
               </span>
             </h2>
@@ -307,7 +307,7 @@ export function StoryScroll() {
 
               <div
                 ref={trackRef}
-                className="flex gap-6 will-change-transform pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] pr-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]"
+                className="flex gap-6 will-change-transform pl-[clamp(2rem,4vw,4.5rem)] pr-[max(2rem,calc((100vw-90rem)/2+6rem))] xl:pl-[clamp(3rem,6vw,6rem)] xl:pr-[max(3rem,calc((100vw-90rem)/2+8rem))]"
               >
                 {CARDS.map((card) => (
                   <StoryCardItem key={card.index} card={card} />
@@ -315,7 +315,7 @@ export function StoryScroll() {
               </div>
 
               {/* Progress indicator — premium detail */}
-              <div className="mx-auto mt-10 flex max-w-6xl items-center gap-3 px-6 lg:px-8">
+              <div className="mx-auto mt-10 flex max-w-none items-center gap-3 px-6 lg:px-[clamp(2rem,4vw,4.5rem)] xl:px-[clamp(3rem,6vw,6rem)]">
                 <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
                   {String(Math.round(progress * (CARDS.length - 1)) + 1).padStart(
                     2,
@@ -359,12 +359,15 @@ export function StoryScroll() {
           >
             <div
               aria-hidden
-              className="shrink-0 basis-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] lg:basis-[max(2rem,calc((100vw-72rem)/2+2rem))]"
+              className="shrink-0 basis-[clamp(2rem,4vw,4.5rem)] xl:basis-[clamp(3rem,6vw,6rem)]"
             />
             {CARDS.map((card) => (
               <StoryCardItem key={card.index} card={card} />
             ))}
-            <div aria-hidden className="shrink-0 basis-16 lg:basis-24" />
+            <div
+              aria-hidden
+              className="shrink-0 basis-[max(2rem,calc((100vw-90rem)/2+6rem))] xl:basis-[max(3rem,calc((100vw-90rem)/2+8rem))]"
+            />
           </div>
         </div>
       )}

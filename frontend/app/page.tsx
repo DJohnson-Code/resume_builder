@@ -78,7 +78,7 @@ export default function Home() {
           NAV
       ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-none items-center justify-between px-6 lg:px-[clamp(2rem,4vw,4.5rem)] xl:px-[clamp(3rem,6vw,6rem)]">
           <a href="#top" className="flex items-baseline gap-2">
             <span className="text-[15px] font-semibold tracking-tight text-foreground">
               Resume<span className="mx-1 text-accent">/</span>Builder
@@ -115,60 +115,107 @@ export default function Home() {
       ──────────────────────────────────────────────────────── */}
       <section
         id="top"
-        className="relative mx-auto max-w-6xl px-6 pt-24 pb-28 lg:px-8 lg:pt-32 lg:pb-36"
+        className="relative isolate mx-auto min-h-[88svh] max-w-none px-6 pt-24 pb-28 lg:min-h-[96svh] lg:px-[clamp(2rem,4vw,4.5rem)] lg:pt-28 lg:pb-40 xl:min-h-screen xl:px-[clamp(3rem,6vw,6rem)]"
       >
-        {/* Decorative rose glint */}
+        {/* Decorative rose glint — dimmed over the photo background */}
         <div
           aria-hidden
-          className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 h-[520px] w-[520px] rounded-full bg-accent/20 blur-[140px]"
+          className="pointer-events-none absolute right-[-10%] top-[-10%] -z-10 h-[390px] w-[390px] rounded-full bg-accent/10 blur-[140px]"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute left-[-8%] bottom-[-20%] -z-10 h-[420px] w-[420px] rounded-full bg-highlight/15 blur-[150px]"
+          className="pointer-events-none absolute left-[-8%] bottom-[-20%] -z-10 h-[315px] w-[315px] rounded-full bg-highlight/8 blur-[150px]"
         />
 
-        <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-          <span className="h-px w-10 bg-accent/60" />
-          <span className="font-mono">
-            For developers, new grads &amp; engineers in motion
-          </span>
-        </div>
+        {/* Asymmetric 12-col grid on lg+: hero content anchors to the left 8
+            columns so the composition activates the left side of the viewport
+            rather than floating in the center. Mobile/tablet fall back to a
+            single-column stack because <lg the grid classes don't apply. */}
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-10 xl:gap-x-14">
+          <div className="lg:col-span-6 lg:col-start-1 xl:col-span-5">
+            <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+              <span className="h-px w-10 bg-accent/60" />
+              <span className="font-mono">
+                For developers, new grads &amp; engineers in motion
+              </span>
+            </div>
 
-        <h1 className="mt-9 max-w-5xl text-[15vw] font-semibold leading-[0.92] tracking-[-0.035em] text-foreground sm:text-7xl lg:text-[7.5rem]">
-          The resume,{" "}
-          <span className="font-serif font-normal italic text-foreground/90">
-            rewritten.
-          </span>
-        </h1>
+            <h1 className="mt-9 max-w-[10ch] font-serif text-[15vw] font-normal leading-[0.92] tracking-[-0.03em] text-foreground sm:text-7xl lg:text-[7.1rem] xl:text-[7.6rem]">
+              The resume,{" "}
+              <span className="italic text-foreground/90">
+                rewritten.
+              </span>
+            </h1>
 
-        <p className="mt-9 max-w-xl text-[15px] leading-[1.7] text-muted-foreground">
-          Paste your career as structured JSON. We validate it against a strict
-          schema and publish an ATS-ready markdown resume in seconds. Built for
-          people who'd rather ship than format.
-        </p>
+            <p className="mt-9 max-w-[37rem] text-[15px] leading-[1.7] text-muted-foreground">
+              Paste your career as structured JSON. We validate it against a
+              strict schema and publish an ATS-ready markdown resume in
+              seconds. Built for people who'd rather ship than format.
+            </p>
 
-        <div className="mt-10 flex flex-wrap items-center gap-4">
-          <a
-            href="#builder"
-            className="inline-flex h-11 items-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Open the builder
-          </a>
-          <a
-            href="#how"
-            className="group inline-flex h-11 items-center gap-2 rounded-full border border-border/80 px-5 text-sm text-foreground/90 transition-colors hover:bg-secondary"
-          >
-            How it works
-            <span className="transition-transform group-hover:translate-x-0.5">
-              →
-            </span>
-          </a>
-        </div>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <a
+                href="#builder"
+                className="inline-flex h-11 items-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Open the builder
+              </a>
+              <a
+                href="#how"
+                className="group inline-flex h-11 items-center gap-2 rounded-full border border-border/80 px-5 text-sm text-foreground/90 transition-colors hover:bg-secondary"
+              >
+                How it works
+                <span className="transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </a>
+            </div>
 
-        {/* Scroll cue */}
-        <div className="mt-24 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-muted-foreground/70">
-          <span className="pulse-soft">↓</span>
-          <span className="font-mono">Scroll</span>
+            {/* Scroll cue */}
+            <div className="mt-24 flex items-center gap-3 text-[10px] uppercase tracking-[0.28em] text-muted-foreground/70">
+              <span className="pulse-soft">↓</span>
+              <span className="font-mono">Scroll</span>
+            </div>
+          </div>
+
+          <aside className="mt-14 lg:col-span-4 lg:col-start-8 lg:mt-6 xl:col-span-4 xl:col-start-8 xl:mt-10">
+            <div className="ring-gradient rounded-[1.6rem] bg-card/72 p-6 backdrop-blur-md lg:p-7">
+              <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-muted-foreground/75">
+                <span className="font-mono">Pipeline</span>
+                <span className="font-mono text-accent">Live</span>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                {[
+                  ["01", "Validate", "Schema checks, warnings, and parse issues before anything ships."],
+                  ["02", "Generate", "Normalized data moves into ATS-ready markdown with the same structure preserved."],
+                  ["03", "Ship", "Use the output anywhere markdown is accepted without rebuilding the resume by hand."],
+                ].map(([index, title, body]) => (
+                  <div key={index} className="rounded-2xl border border-border/60 bg-background/35 px-4 py-4">
+                    <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/80">
+                      <span className="text-accent">{index}</span>
+                      <span className="h-px flex-1 bg-border/70" />
+                      <span>{title}</span>
+                    </div>
+                    <p className="mt-3 text-sm leading-[1.65] text-foreground/86">{body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 grid grid-cols-3 gap-3 border-t border-border/60 pt-5">
+                {[
+                  ["Input", "JSON"],
+                  ["Output", "Markdown"],
+                  ["Mode", "ATS"],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">{label}</p>
+                    <p className="mt-2 text-sm font-medium text-foreground/90">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -182,7 +229,7 @@ export default function Home() {
       ──────────────────────────────────────────────────────── */}
       <section
         id="builder"
-        className="relative mx-auto max-w-6xl scroll-mt-24 px-6 pt-24 pb-16 lg:px-8 lg:pt-32"
+        className="relative mx-auto max-w-7xl scroll-mt-24 px-6 pt-24 pb-16 lg:px-8 lg:pt-32"
       >
         <SectionIntro
           index="01"
@@ -198,16 +245,16 @@ export default function Home() {
           description="Drop a resume payload on the left. The right column streams validation, the raw API response, and the generated markdown as you work."
         />
 
-        <div className="mt-14 grid gap-14 lg:grid-cols-5 lg:gap-12">
+        <div className="mt-14 grid gap-14 lg:grid-cols-2 lg:gap-12">
           {/* Left — Input */}
-          <div className="space-y-7 lg:col-span-3">
+          <div className="space-y-7">
             <Field
               id="json-input"
               label="Resume JSON"
               description="Paste data matching the backend's ResumeIn schema — name, email, phone, experience, skills. Sent as-is to the API."
               error={parseError ? `JSON parse error: ${parseError}` : null}
             >
-              <div className="ring-gradient relative rounded-xl bg-card/40 backdrop-blur-sm">
+              <div className="ring-gradient relative rounded-xl bg-card/60 backdrop-blur-sm">
                 <textarea
                   id="json-input"
                   value={jsonInput}
@@ -277,7 +324,7 @@ export default function Home() {
           </div>
 
           {/* Right — Output */}
-          <div className="space-y-5 lg:col-span-2">
+          <div className="space-y-5">
             <ResultPanel
               title="Validation"
               meta="POST /validate"
@@ -358,7 +405,7 @@ export default function Home() {
       ──────────────────────────────────────────────────────── */}
       <section
         id="how"
-        className="relative mx-auto max-w-6xl scroll-mt-24 px-6 py-28 lg:px-8"
+        className="relative mx-auto max-w-7xl scroll-mt-24 px-6 py-28 lg:px-8"
       >
         <SectionIntro
           index="02"
@@ -396,8 +443,8 @@ export default function Home() {
       {/* ────────────────────────────────────────────────────────
           CLOSING CTA
       ──────────────────────────────────────────────────────── */}
-      <section className="relative mx-auto max-w-6xl px-6 pb-28 lg:px-8">
-        <div className="ring-gradient relative overflow-hidden rounded-3xl bg-card/40 px-8 py-16 backdrop-blur-md md:px-16 md:py-20">
+      <section className="relative mx-auto max-w-7xl px-6 pb-28 lg:px-8">
+        <div className="ring-gradient relative overflow-hidden rounded-3xl bg-card/60 px-8 py-16 backdrop-blur-md md:px-16 md:py-20">
           <div
             aria-hidden
             className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-[120px]"
@@ -410,9 +457,9 @@ export default function Home() {
             <span className="h-px w-10 bg-accent/60" />
             <span className="font-mono">Ready when you are</span>
           </p>
-          <h2 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.02] tracking-[-0.02em] text-foreground md:text-5xl lg:text-6xl">
+          <h2 className="mt-6 max-w-3xl font-serif text-4xl font-normal leading-[1.02] tracking-[-0.02em] text-foreground md:text-5xl lg:text-6xl">
             Stop formatting.{" "}
-            <span className="font-serif italic text-foreground/90">
+            <span className="italic text-foreground/90">
               Start shipping.
             </span>
           </h2>
@@ -437,14 +484,14 @@ export default function Home() {
           FOOTER
       ──────────────────────────────────────────────────────── */}
       <footer className="relative border-t border-border/60">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4 lg:px-8">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4 lg:px-8">
           <Stat value="FastAPI" label="backend" />
           <Stat value="GPT" label="generation engine" />
           <Stat value="ATS" label="optimized output" />
           <Stat value="v1" label="api surface" />
         </div>
         <div className="border-t border-border/60">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 px-6 py-6 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-6 py-6 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 md:flex-row md:items-center md:justify-between lg:px-8">
             <span className="font-mono">
               Resume Builder · crafted for the terminal generation
             </span>
@@ -478,7 +525,7 @@ function SectionIntro({
         <span className="h-px w-8 bg-muted-foreground/40" />
         <span className="font-mono">{eyebrow}</span>
       </div>
-      <h2 className="mt-6 text-4xl font-semibold leading-[1.02] tracking-[-0.02em] text-foreground md:text-5xl lg:text-[3.5rem]">
+      <h2 className="mt-6 font-serif text-4xl font-normal leading-[1.02] tracking-[-0.02em] text-foreground md:text-5xl lg:text-[3.5rem]">
         {title}
       </h2>
       {description && (

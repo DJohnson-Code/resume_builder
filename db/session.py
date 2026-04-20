@@ -37,6 +37,7 @@ async def dispose_db():
 
 
 async def get_db(): 
+
     if _async_session_local is None: 
         raise HTTPException(status_code=503, detail="Database not configured") 
     

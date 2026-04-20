@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Fraunces } from 'next/font/google'
+import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
 })
-const fraunces = Fraunces({
+const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
   style: ['normal', 'italic'],
   variable: '--font-serif',
@@ -49,9 +49,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${fraunces.variable} bg-background`}
+      className={`${geist.variable} ${geistMono.variable} ${playfairDisplay.variable} bg-background`}
     >
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/backgrounds/earth-night.avif"
+          type="image/avif"
+        />
+      </head>
       <body className="font-sans antialiased">
+        <div aria-hidden="true" className="bg-photo" />
+        <div aria-hidden="true" className="bg-shimmer" />
+        <div aria-hidden="true" className="bg-stars" />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
