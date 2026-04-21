@@ -1,27 +1,46 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google'
+import {
+  Geist_Mono,
+  Stint_Ultra_Expanded,
+  Pontano_Sans,
+  Fugaz_One,
+} from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { CustomCursor } from '@/components/landing/custom-cursor'
 import './globals.css'
 
-const geist = Geist({
+const pontano = Pontano_Sans({
   subsets: ['latin'],
+  weight: ['400'],
   variable: '--font-sans',
+  display: 'swap',
 })
+
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
 })
-const playfairDisplay = Playfair_Display({
+
+const stint = Stint_Ultra_Expanded({
   subsets: ['latin'],
-  style: ['normal', 'italic'],
-  variable: '--font-serif',
+  weight: ['400'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+const fugaz = Fugaz_One({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-accent',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Resume Builder — ATS-ready resumes, generated',
+  title: 'Kerning — intelligent, ATS-ready resumes',
   description:
-    'Structured resumes, polished by AI. Paste JSON, validate against a strict schema, and generate ATS-friendly markdown.',
-  generator: 'v0.app',
+    'Kerning turns your career notes into a clean, validated, ATS-ready resume. Structured input, intelligent review, professional output.',
+  generator: 'kerning',
   icons: {
     icon: [
       {
@@ -49,20 +68,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${playfairDisplay.variable} bg-background`}
+      className={`${pontano.variable} ${geistMono.variable} ${stint.variable} ${fugaz.variable} bg-background`}
     >
-      <head>
-        <link
-          rel="preload"
-          as="image"
-          href="/backgrounds/earth-night.avif"
-          type="image/avif"
-        />
-      </head>
       <body className="font-sans antialiased">
-        <div aria-hidden="true" className="bg-photo" />
-        <div aria-hidden="true" className="bg-shimmer" />
-        <div aria-hidden="true" className="bg-stars" />
+        <div aria-hidden="true" className="bg-base" />
+        <div aria-hidden="true" className="bg-grid" />
+        <div aria-hidden="true" className="bg-aperture" />
+        <CustomCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
