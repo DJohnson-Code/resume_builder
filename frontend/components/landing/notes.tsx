@@ -4,20 +4,20 @@ import { Reveal } from "./reveal"
 
 const NOTES: Array<{ q: string; a: string }> = [
   {
-    q: "Is my content ever used to train a model?",
-    a: "No. Your resume content stays on your account and is never mixed into training data. Review runs on your material only, in session.",
+    q: "Are suggestions grounded in my own resume?",
+    a: "Yes. Kerning works from the material you provide and surfaces changes next to the source they came from. The point is better expression, not fabricated experience.",
   },
   {
-    q: "Can I bring an existing resume?",
-    a: "Yes. Drop a PDF or DOCX and Kerning will pull it into the structured editor with its sections intact, so you can continue from where you left off.",
+    q: "Can I start from an existing resume?",
+    a: "Yes. Bring a current PDF, DOCX, or rough draft. The workflow is designed to turn existing material into structured, editable resume data instead of making you start blank.",
   },
   {
-    q: "Which ATS systems is it tuned for?",
-    a: "Greenhouse, Lever, Workday, iCIMS, and Ashby cover most roles. Output is validated against the same parsing rules those systems use, not a marketing claim.",
+    q: "What makes the output ATS-friendly?",
+    a: "Clean section structure, parser-safe formatting, readable headings, and stable extracted fields. Kerning optimizes for both machine parsing and human scanning at the same time.",
   },
   {
-    q: "Do I own my files?",
-    a: "Fully. Markdown and JSON export gives you a portable source of truth — take your resume anywhere, anytime, with no migration.",
+    q: "Do I keep ownership of the final files?",
+    a: "Fully. The final resume stays portable through markdown and structured exports, so you always keep a clean source of truth outside the product.",
   },
 ]
 
@@ -28,14 +28,15 @@ export function Notes() {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <Reveal>
-              <p className="meta">§ 05 · NOTES</p>
+              <p className="meta">§ 05 · QUALITY NOTES</p>
               <h2 className="mt-6 font-display text-[clamp(2rem,4vw,3.4rem)] leading-[1.0] tracking-[-0.018em]">
-                Fine print,
+                Quality, trust,
                 <br />
                 written plainly.
               </h2>
               <p className="mt-6 max-w-md text-[14px] leading-[1.7] text-muted-foreground">
-                The answers we give when people ask. No legalese, no dodging.
+                The practical questions serious users ask before they trust a
+                resume tool with something important.
               </p>
             </Reveal>
           </div>

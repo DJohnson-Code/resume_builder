@@ -5,11 +5,9 @@ import { cn } from "@/lib/utils"
 type Variant = "compact" | "wide"
 
 /**
- * AppPreview — a believable, static mock of the Kerning builder. Two
- * panels side-by-side: the structured editor on the left, the rendered
- * ATS-ready resume on the right. No animation inside; the container
- * handles parallax / scale. Content is deliberately mundane and
- * professional to sell product credibility.
+ * AppPreview — believable product UI. The left side shows structured input
+ * plus review assistance; the right side shows the polished output. Dark UI
+ * shell, readable contrast, and restrained product detail.
  */
 export function AppPreview({
   variant = "wide",
@@ -27,14 +25,14 @@ export function AppPreview({
       )}
     >
       {/* Window chrome */}
-      <div className="flex items-center justify-between gap-4 border-b border-border bg-surface-2/60 px-5 py-3">
+      <div className="flex items-center justify-between gap-4 border-b border-border bg-surface-2/70 px-5 py-3">
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.78_0.13_30)]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.82_0.12_80)]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.72_0.11_145)]" />
-          <span className="ml-3 font-mono text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground">
-            kerning · editor
-          </span>
+            <span className="h-2.5 w-2.5 rounded-full bg-destructive" />
+            <span className="h-2.5 w-2.5 rounded-full bg-warning" />
+            <span className="h-2.5 w-2.5 rounded-full bg-success" />
+            <span className="ml-3 font-mono text-[10.5px] uppercase tracking-[0.18em] text-muted-foreground">
+              kerning · editor
+            </span>
         </div>
         <div className="hidden items-center gap-2 md:flex">
           <Chip>autosave</Chip>
@@ -43,13 +41,13 @@ export function AppPreview({
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        {/* Editor column */}
-        <div className="border-b border-border md:border-b-0 md:border-r">
-          <div className="flex items-center justify-between border-b border-border bg-surface/40 px-5 py-2.5">
-            <p className="meta">SECTION · EXPERIENCE</p>
-            <p className="meta">3 / 4 COMPLETE</p>
-          </div>
+        <div className="grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          {/* Editor column */}
+          <div className="border-b border-border md:border-b-0 md:border-r">
+            <div className="flex items-center justify-between border-b border-border bg-surface/30 px-5 py-2.5">
+              <p className="meta">SECTION · EXPERIENCE</p>
+              <p className="meta">3 / 4 COMPLETE</p>
+            </div>
 
           <div className="space-y-4 p-5">
             <Field label="Role">
@@ -89,7 +87,7 @@ export function AppPreview({
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-surface-2/50 p-3.5">
+            <div className="rounded-xl border border-border bg-surface-2/65 p-3.5">
               <div className="flex items-center justify-between">
                 <p className="meta">ASSIST · suggestion</p>
                 <span className="font-mono text-[10.5px] text-muted-foreground">
@@ -102,7 +100,7 @@ export function AppPreview({
                 verbs first.
               </p>
               <div className="mt-3 flex items-center gap-2">
-                <button className="inline-flex h-7 items-center rounded-full bg-foreground px-3 text-[11.5px] font-medium text-background">
+                <button className="inline-flex h-7 items-center rounded-full bg-primary px-3 text-[11.5px] font-medium text-primary-foreground">
                   Apply
                 </button>
                 <button className="inline-flex h-7 items-center rounded-full border border-border px-3 text-[11.5px] text-foreground">
@@ -112,14 +110,14 @@ export function AppPreview({
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Rendered resume column */}
-        <div className="bg-[oklch(0.995_0.003_85)]">
-          <div className="flex items-center justify-between border-b border-border bg-surface/40 px-5 py-2.5">
-            <p className="meta">OUTPUT · resume.md</p>
-            <p className="meta">ATS · 97.4 / 100</p>
           </div>
+
+          {/* Rendered resume column */}
+          <div className="bg-[linear-gradient(180deg,oklch(0.955_0.01_85),oklch(0.93_0.01_80))] text-[oklch(0.2_0.01_60)]">
+            <div className="flex items-center justify-between border-b border-black/6 bg-black/4 px-5 py-2.5">
+              <p className="meta">OUTPUT · resume.md</p>
+              <p className="meta">ATS · 97.4 / 100</p>
+            </div>
           <div className="p-6 md:p-8">
             <p className="font-display text-[clamp(1.5rem,2.1vw,2rem)] leading-[1.05] tracking-[-0.01em] text-foreground">
               Jordan Avery

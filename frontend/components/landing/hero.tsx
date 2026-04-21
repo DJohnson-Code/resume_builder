@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from "react"
 import { AppPreview } from "./app-preview"
 
 /**
- * Hero — bold editorial statement, concise support copy, two clear CTAs,
- * and a parallax-layered product aperture. The section reveals with a
- * blur-to-sharp cascade on mount, then the preview parallaxes on scroll
- * (tiny, disciplined — not a spectacle).
+ * Hero — cinematic first impression with clear product value, a disciplined
+ * blur-to-sharp reveal, and a believable product glimpse that subtly shifts
+ * in depth on scroll.
  */
 export function Hero() {
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -68,22 +67,25 @@ export function Hero() {
           {/* Copy column */}
           <div className="lg:col-span-7">
             <div className="flex items-center gap-3">
-              <span className="meta">
-                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[oklch(0.64_0.11_145)] align-middle" />
-                NOW IN PRIVATE BETA · 2026
+              <span className="meta eyebrow before:bg-accent/60">
+                AI-assisted resume workflow
               </span>
             </div>
 
-            <h1 className="mt-8 font-display text-[clamp(2.8rem,8vw,6.6rem)] leading-[0.94] tracking-[-0.018em] text-foreground">
-              Resumes that
+            <h1 className="mt-8 max-w-[10.5ch] font-display text-[clamp(3rem,8vw,7rem)] leading-[0.9] text-foreground">
+              <span className="font-accent text-accent">Build</span> the resume
               <br />
-              read you right.
+              that gets
+              <span className="font-accent ml-3 inline-block text-accent">
+                read.
+              </span>
             </h1>
 
-            <p className="mt-8 max-w-[38ch] text-[clamp(1rem,1.2vw,1.15rem)] leading-[1.65] text-muted-foreground">
-              Kerning turns scattered career notes into a clean, structured,
-              ATS-ready resume. Validated as you write. Refined by review.
-              Exported on demand.
+            <p className="mt-8 max-w-[38ch] text-[clamp(1rem,1.2vw,1.15rem)] leading-[1.72] text-muted-foreground">
+              Kerning turns rough bullets, old resumes, and scattered career
+              notes into a clean, ATS-friendly draft. Structure first.
+              Intelligent review next. Polished output when you are ready to
+              send.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -91,7 +93,7 @@ export function Hero() {
                 href="/builder"
                 className="group inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-[14px] font-medium text-primary-foreground transition-transform duration-300 hover:-translate-y-[2px]"
               >
-                Start your resume
+                Open the builder
                 <span
                   aria-hidden
                   className="transition-transform duration-300 group-hover:translate-x-0.5"
@@ -101,16 +103,16 @@ export function Hero() {
               </a>
               <a
                 href="#workflow"
-                className="inline-flex h-12 items-center rounded-full border border-border-strong bg-surface px-5 text-[14px] text-foreground transition-colors hover:border-foreground/60"
+                className="inline-flex h-12 items-center rounded-full border border-border-strong bg-surface/80 px-5 text-[14px] text-foreground transition-colors hover:border-foreground/60"
               >
                 See the workflow
               </a>
             </div>
 
             <dl className="mt-14 grid max-w-xl grid-cols-3 gap-6 border-t border-border pt-8">
-              <HeroStat label="Built for ATS" value="97.4%" sub="parse rate" />
-              <HeroStat label="Schema checks" value="38" sub="on every save" />
-              <HeroStat label="Avg. review" value="1m 12s" sub="to first clean draft" />
+              <HeroStat label="Structured input" value="JSON" sub="sections, dates, links" />
+              <HeroStat label="Validation" value="Live" sub="schema + wording checks" />
+              <HeroStat label="Output" value="ATS" sub="clean markdown + export" />
             </dl>
           </div>
 
@@ -123,26 +125,26 @@ export function Hero() {
               />
               <AppPreview variant="compact" />
 
-              {/* Floating annotations that hint at product depth */}
-              <Annotation
-                className="absolute -left-6 top-10 hidden md:block"
-                kind="OK"
-                label="All sections validated"
-              />
-              <Annotation
-                className="absolute -right-6 bottom-24 hidden md:block"
-                kind="NOTE"
-                label="Tone tightened · 3 edits"
-              />
+               {/* Floating annotations that hint at product depth */}
+               <Annotation
+                 className="absolute -left-6 top-10 hidden md:block"
+                 kind="OK"
+                 label="Validation clean"
+               />
+               <Annotation
+                 className="absolute -right-6 bottom-24 hidden md:block"
+                 kind="NOTE"
+                 label="3 edits suggested"
+               />
             </div>
           </div>
         </div>
 
         {/* Scroll cue + ruler */}
         <div className="mt-24 flex items-end justify-between border-t border-border pt-6">
-          <p className="meta">SCROLL · for the workflow</p>
+          <p className="meta">Scroll for the product flow</p>
           <p className="meta hidden md:block">
-            TRUSTED BY ENGINEERS AT · ACME · MONOSPACE · COLLATERAL · STRUCT
+            STRUCTURED INPUT · LIVE VALIDATION · GUIDED IMPROVEMENT · ATS OUTPUT
           </p>
         </div>
       </div>
@@ -162,7 +164,7 @@ function HeroStat({
   return (
     <div>
       <dt className="meta">{label}</dt>
-      <dd className="mt-3 font-display text-2xl tracking-[-0.01em] text-foreground">
+      <dd className="mt-3 font-display text-2xl tracking-[-0.03em] text-foreground">
         {value}
       </dd>
       <p className="mt-1 text-[12px] text-muted-foreground">{sub}</p>

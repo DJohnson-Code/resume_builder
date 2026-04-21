@@ -5,19 +5,20 @@ import { Reveal } from "./reveal"
 export function SiteFooter() {
   const year = new Date().getFullYear()
   return (
-    <footer className="relative border-t border-border bg-surface/60">
+    <footer className="relative border-t border-border bg-surface/55">
       <div className="mx-auto grid max-w-[min(1380px,94vw)] gap-14 px-6 py-20 md:grid-cols-12 md:py-28">
         <div className="md:col-span-5">
           <Reveal>
-            <p className="meta">FOO · FILE /footer</p>
+            <p className="meta">FOOTER · KERNING</p>
             <h3 className="mt-6 font-display text-[clamp(2.2rem,4vw,3rem)] leading-[0.98] tracking-[-0.015em]">
-              Resumes should
+              Serious product,
               <br />
-              read like software.
+              serious output.
             </h3>
             <p className="mt-5 max-w-md text-[14.5px] leading-[1.7] text-muted-foreground">
-              Clear structure, honest signals, predictable output. Kerning is
-              built by engineers who got tired of fighting Word.
+              Kerning is built for people who want cleaner resumes without
+              sacrificing control. Structured input, readable output, and a
+              workflow that feels considered all the way through.
             </p>
           </Reveal>
         </div>
@@ -28,25 +29,25 @@ export function SiteFooter() {
             links={[
               ["Builder", "/builder"],
               ["Workflow", "#workflow"],
-              ["ATS report", "#trust"],
-              ["Changelog", "#"],
+              ["Quality", "#trust"],
+              ["Notes", "#faq"],
             ]}
           />
           <FooterColumn
-            title="Craft"
+            title="System"
             links={[
-              ["Principles", "#"],
-              ["Schema", "#"],
-              ["Typography notes", "#"],
-              ["Grid system", "#"],
+              ["Validation", "#features"],
+              ["Assist", "#features"],
+              ["Generate", "#features"],
+              ["ATS", "#trust"],
             ]}
           />
           <FooterColumn
-            title="Company"
+            title="Access"
             links={[
-              ["About", "#"],
-              ["Careers", "#"],
-              ["Press", "#"],
+              ["Open builder", "/builder"],
+              ["Home", "#top"],
+              ["Documentation", "#faq"],
               ["Contact", "mailto:hello@kerning.app"],
             ]}
           />
@@ -55,7 +56,7 @@ export function SiteFooter() {
 
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-[min(1380px,94vw)] flex-col gap-4 px-6 py-8 md:flex-row md:items-center md:justify-between">
-          <p className="meta">© {year} Kerning Labs · Made in transit</p>
+          <p className="meta">© {year} Kerning Labs · resume workflows, refined</p>
           <p className="meta flex items-center gap-4">
             <span>STATUS · operational</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[oklch(0.64_0.11_145)]" />

@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 
 const LINKS = [
   { href: "#workflow", label: "Workflow" },
-  { href: "#features", label: "Product" },
-  { href: "#trust", label: "ATS" },
+  { href: "#features", label: "Features" },
+  { href: "#trust", label: "Quality" },
   { href: "#faq", label: "Notes" },
 ]
 
@@ -32,17 +32,17 @@ export function SiteNav() {
           className={cn(
             "flex w-full items-center justify-between rounded-full border px-5 py-2.5 transition-all duration-500",
             scrolled
-              ? "border-border bg-surface/85 backdrop-blur-xl shadow-[0_12px_40px_-24px_oklch(0.18_0.006_60/0.25)]"
+              ? "border-border-strong bg-surface/78 backdrop-blur-2xl shadow-[0_24px_60px_-36px_oklch(0.04_0.01_255/0.9)]"
               : "border-transparent bg-transparent",
           )}
         >
           <a href="#top" className="flex items-center gap-2.5">
             <LogoMark />
-            <span className="font-display text-[17px] leading-none tracking-[-0.01em] text-foreground">
+            <span className="font-display text-[17px] leading-none text-foreground">
               Kerning
             </span>
             <span className="ml-1 hidden font-mono text-[9.5px] uppercase tracking-[0.22em] text-muted-foreground md:inline">
-              v1 · private beta
+              AI resume builder
             </span>
           </a>
 
@@ -61,15 +61,9 @@ export function SiteNav() {
           <div className="flex items-center gap-2">
             <a
               href="/builder"
-              className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground md:inline"
+              className="inline-flex h-10 items-center rounded-full bg-primary px-4 text-[12.5px] font-medium tracking-[0.01em] text-primary-foreground transition-transform duration-300 hover:-translate-y-[1px]"
             >
-              Sign in
-            </a>
-            <a
-              href="/builder"
-              className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-[12.5px] font-medium tracking-[0.01em] text-primary-foreground transition-transform duration-300 hover:-translate-y-[1px]"
-            >
-              Start building
+              Open builder
             </a>
           </div>
         </div>
@@ -82,7 +76,7 @@ function LogoMark() {
   return (
     <span
       aria-hidden
-      className="grid h-7 w-7 place-items-center rounded-[8px] bg-foreground text-background"
+      className="grid h-8 w-8 place-items-center rounded-[10px] border border-border-strong bg-surface-3/80 text-accent"
     >
       <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none">
         <path

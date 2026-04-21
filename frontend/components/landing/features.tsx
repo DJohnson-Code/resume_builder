@@ -16,25 +16,25 @@ const FEATURES: Feature[] = [
   {
     index: "01",
     label: "VALIDATE",
-    title: "A strict schema, kind about it.",
+    title: "Validation that reads like product, not debug output.",
     body:
-      "Every section has a contract. Kerning flags missing fields, ambiguous dates, and tone slips — and proposes a concrete fix next to each one.",
+      "Every section has a structure. Kerning points to what is missing, what is ambiguous, and what weakens the draft, with clear language people can act on quickly.",
     preview: <ValidatePreview />,
   },
   {
     index: "02",
     label: "ASSIST",
-    title: "Review that sharpens, never invents.",
+    title: "Intelligent help that stays grounded in your source material.",
     body:
-      "Suggestions are grounded in your own notes. Every rewrite shows the source, the change, and why it lands better — you stay in control of your voice.",
+      "Suggestions stay tied to your own content. Every rewrite has context, contrast, and a reason for the change, so the draft improves without becoming generic.",
     preview: <AssistPreview />,
   },
   {
     index: "03",
     label: "GENERATE",
-    title: "One source, every format.",
+    title: "One clean source, ready for every hiring workflow.",
     body:
-      "Export a recruiter-ready PDF, a parser-friendly DOCX, and a portable markdown source from a single canonical resume. Re-export on any change.",
+      "Generate ATS-friendly markdown and exportable outputs from the same structured resume source. The draft stays easy to revise and easy to trust.",
     preview: <GeneratePreview />,
   },
 ]
@@ -58,19 +58,18 @@ export function Features() {
             <Reveal>
               <p className="meta">§ 03 · PRODUCT</p>
               <h2 className="mt-6 font-display text-[clamp(2rem,4.2vw,3.6rem)] leading-[1.0] tracking-[-0.018em]">
-                A small kit of
+                Three product modules.
                 <br />
-                sharp tools.
+                Zero filler.
               </h2>
             </Reveal>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <Reveal delay={1}>
               <p className="text-[14.5px] leading-[1.7] text-muted-foreground">
-                Not a wall of settings. Three modules that do real work:
-                validation that catches what reviewers will, review that
-                tightens without rewriting your voice, and export that stays
-                readable for both humans and parsers.
+                Each module earns its place: validation for structure, review
+                for wording, and generation for the output you actually send.
+                Deep enough to be useful. Clear enough to trust on first use.
               </p>
             </Reveal>
           </div>

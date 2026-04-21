@@ -47,26 +47,25 @@ export function Trust() {
             <Reveal>
               <p className="meta">§ 04 · ATS</p>
               <h2 className="mt-6 font-display text-[clamp(2rem,4.2vw,3.6rem)] leading-[1.0] tracking-[-0.018em]">
-                Clean for
+                Professional for
                 <br />
-                parsers. Clean
+                people. Stable for
                 <br />
-                for people.
+                parsers.
               </h2>
             </Reveal>
           </div>
           <div className="md:col-span-6 md:col-start-7">
             <Reveal delay={1}>
               <p className="text-[14.5px] leading-[1.7] text-muted-foreground">
-                Kerning resumes are built from a strict document model. No
-                hidden tables, no rasterised logos, no columns that confuse a
-                parser. What a human reads and what a system extracts are the
-                same story.
+                Kerning resumes are built from a clean document model. No layout
+                tricks, no parser-hostile formatting, no mystery structure.
+                What a recruiter reads and what an ATS extracts stay aligned.
               </p>
               <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-border pt-6">
                 <Stat value="97.4%" label="parse rate · avg" />
                 <Stat value="0" label="tables in output" />
-                <Stat value="12pt" label="body baseline" />
+                <Stat value="1" label="source of truth" />
               </dl>
             </Reveal>
           </div>

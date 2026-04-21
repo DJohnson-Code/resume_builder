@@ -1,17 +1,16 @@
 import type { Metadata } from 'next'
 import {
   Geist_Mono,
-  Stint_Ultra_Expanded,
-  Pontano_Sans,
+  Work_Sans,
   Fugaz_One,
 } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CustomCursor } from '@/components/landing/custom-cursor'
 import './globals.css'
 
-const pontano = Pontano_Sans({
+const workSans = Work_Sans({
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-sans',
   display: 'swap',
 })
@@ -19,13 +18,6 @@ const pontano = Pontano_Sans({
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
-  display: 'swap',
-})
-
-const stint = Stint_Ultra_Expanded({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-display',
   display: 'swap',
 })
 
@@ -37,9 +29,9 @@ const fugaz = Fugaz_One({
 })
 
 export const metadata: Metadata = {
-  title: 'Kerning — intelligent, ATS-ready resumes',
+  title: 'Kerning — AI-assisted ATS-friendly resumes',
   description:
-    'Kerning turns your career notes into a clean, validated, ATS-ready resume. Structured input, intelligent review, professional output.',
+    'Turn messy resume information into a clean, validated, ATS-friendly resume with structured editing, intelligent review, and polished output.',
   generator: 'kerning',
   icons: {
     icon: [
@@ -68,7 +60,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${pontano.variable} ${geistMono.variable} ${stint.variable} ${fugaz.variable} bg-background`}
+      className={`${workSans.variable} ${geistMono.variable} ${fugaz.variable} bg-background`}
     >
       <body className="font-sans antialiased">
         <div aria-hidden="true" className="bg-base" />

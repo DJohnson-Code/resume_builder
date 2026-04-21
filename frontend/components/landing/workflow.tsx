@@ -14,34 +14,34 @@ type Step = {
 const STEPS: Step[] = [
   {
     index: "01",
-    eyebrow: "ORGANIZE",
-    title: "Your career, placed on a grid.",
+    eyebrow: "INGEST",
+    title: "Bring every version into one structured draft.",
     body:
-      "Pull notes from anywhere — old PDFs, bullet journals, a LinkedIn dump. Kerning breaks them into structured sections with the fields reviewers actually look for.",
-    chips: ["Sections", "Dates", "Entities", "Links"],
+      "Start from a pasted resume, a LinkedIn export, or rough notes. Kerning pulls that material into a clean model with the fields hiring teams and ATS systems both need.",
+    chips: ["Sections", "Dates", "Links", "Experience"],
   },
   {
     index: "02",
     eyebrow: "VALIDATE",
-    title: "Mistakes before they go out.",
+    title: "Catch weak points before recruiters do.",
     body:
-      "Every section runs against a strict schema and a tone lint. Missing dates, weak verbs, inconsistent casing, orphaned bullets — all surfaced with one-click fixes.",
+      "Every section runs through a strict schema, parser checks, and content linting. Missing dates, soft bullets, and inconsistent formatting are surfaced while the draft is still in motion.",
     chips: ["Schema", "Tone", "Dates", "Verbs"],
   },
   {
     index: "03",
     eyebrow: "IMPROVE",
-    title: "Tighter lines, your voice.",
+    title: "Sharpen the writing without losing your voice.",
     body:
-      "Review suggests concrete rewrites grounded in your inputs. Never fabricated, never generic — just sharper phrasing with the receipts kept next to every change.",
+      "Suggestions stay grounded in your own material. Kerning rewrites for clarity, stronger verbs, and tighter structure while keeping every change inspectable.",
     chips: ["Rewrite", "Quantify", "Trim", "Compare"],
   },
   {
     index: "04",
     eyebrow: "GENERATE",
-    title: "Clean files, ready to send.",
+    title: "Generate the version you can send.",
     body:
-      "Export a recruiter-ready PDF, a parser-friendly DOCX, and a portable markdown source — all from the same canonical resume. Re-export anytime the story changes.",
+      "Export clean markdown and production-friendly files from the same canonical source. Human-readable. ATS-friendly. Easy to revise the next time the story changes.",
     chips: ["PDF", "DOCX", "Markdown", "ATS report"],
   },
 ]
@@ -88,21 +88,21 @@ export function Workflow() {
           <div>
             <p className="meta">§ 02 · WORKFLOW</p>
             <h2 className="mt-6 max-w-[22ch] font-display text-[clamp(2.2rem,5vw,4.2rem)] leading-[0.98] tracking-[-0.018em]">
-              Four steps. No
+              Four steps. One
               <br />
-              blank page stare.
+              cleaner draft.
             </h2>
           </div>
           <p className="hidden max-w-sm text-[14px] leading-[1.65] text-muted-foreground md:block">
-            Each step is a first-class view inside the builder. Keep writing,
-            Kerning keeps its end of the conversation — structured, honest,
-            ready to ship.
+            A real product flow, not a pitch deck. Input comes in rough,
+            validation makes the issues visible, and the final output leaves in
+            a format you can actually use.
           </p>
         </div>
       </div>
 
-      {/* Sticky scroll-jacked rail. Budget: ~4 screen heights so the motion
-          feels deliberate but never traps the reader too long. */}
+      {/* Sticky depth rail. Panels resolve through depth as the user scrolls
+          the workflow, keeping the sequence spatial rather than just linear. */}
       <div
         ref={wrapperRef}
         style={{ height: `${100 + STEPS.length * 70}vh` }}
@@ -175,7 +175,7 @@ export function Workflow() {
 
         {/* Progress ruler (fixed above the sticky stage bottom) */}
         <div className="pointer-events-none absolute inset-x-0 bottom-8 z-10 mx-auto flex max-w-[min(1380px,94vw)] items-center gap-4 px-6">
-          <p className="meta">{STEPS[active].eyebrow}</p>
+                <p className="meta">{STEPS[active].eyebrow}</p>
           <div className="relative h-px flex-1 bg-border">
             <div
               className="absolute inset-y-0 left-0 bg-foreground transition-[width] duration-75 ease-out"

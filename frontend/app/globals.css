@@ -4,61 +4,57 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ──────────────────────────────────────────────────────────────
-     Kerning palette — neutral foundation with elegant contrast.
-     Paper-ivory background, deep ink foreground, warm graphite
-     accents, and a single trustworthy green reserved for pass
-     states. Nothing saturated. Nothing futuristic.
-  ────────────────────────────────────────────────────────────── */
-  --background: oklch(0.965 0.004 85);
-  --foreground: oklch(0.18 0.006 60);
+  color-scheme: dark;
 
-  --surface: oklch(0.988 0.003 85);
-  --surface-2: oklch(0.938 0.005 80);
-  --surface-3: oklch(0.905 0.006 80);
+  --background: oklch(0.17 0.014 255);
+  --foreground: oklch(0.95 0.01 80);
 
-  --card: oklch(0.988 0.003 85);
-  --card-foreground: oklch(0.18 0.006 60);
-  --popover: oklch(0.988 0.003 85);
-  --popover-foreground: oklch(0.18 0.006 60);
+  --surface: oklch(0.21 0.014 255);
+  --surface-2: oklch(0.25 0.015 252);
+  --surface-3: oklch(0.31 0.02 248);
 
-  --primary: oklch(0.18 0.006 60);
-  --primary-foreground: oklch(0.985 0.003 85);
+  --card: oklch(0.22 0.014 255);
+  --card-foreground: oklch(0.95 0.01 80);
+  --popover: oklch(0.2 0.014 255);
+  --popover-foreground: oklch(0.95 0.01 80);
 
-  --secondary: oklch(0.925 0.005 80);
-  --secondary-foreground: oklch(0.22 0.006 60);
+  --primary: oklch(0.79 0.1 72);
+  --primary-foreground: oklch(0.16 0.012 255);
 
-  --muted: oklch(0.94 0.005 80);
-  --muted-foreground: oklch(0.45 0.008 70);
+  --secondary: oklch(0.28 0.018 250);
+  --secondary-foreground: oklch(0.93 0.01 80);
 
-  --accent: oklch(0.55 0.02 50);
-  --accent-foreground: oklch(0.985 0.003 85);
+  --muted: oklch(0.25 0.01 252);
+  --muted-foreground: oklch(0.72 0.015 75);
 
-  --highlight: oklch(0.72 0.06 140);
-  --highlight-foreground: oklch(0.18 0.006 60);
+  --accent: oklch(0.73 0.1 55);
+  --accent-foreground: oklch(0.16 0.012 255);
 
-  --destructive: oklch(0.58 0.18 28);
-  --destructive-foreground: oklch(0.985 0.003 85);
+  --highlight: oklch(0.6 0.05 250);
+  --highlight-foreground: oklch(0.95 0.01 80);
 
-  --success: oklch(0.64 0.11 145);
-  --success-foreground: oklch(0.985 0.003 85);
+  --destructive: oklch(0.63 0.18 28);
+  --destructive-foreground: oklch(0.96 0.01 80);
 
-  --warning: oklch(0.78 0.13 80);
-  --warning-foreground: oklch(0.2 0.006 60);
+  --success: oklch(0.72 0.1 145);
+  --success-foreground: oklch(0.16 0.012 255);
 
-  --border: oklch(0.88 0.006 80);
-  --border-strong: oklch(0.78 0.006 70);
-  --input: oklch(0.955 0.005 80);
-  --ring: oklch(0.35 0.01 60);
+  --warning: oklch(0.8 0.12 78);
+  --warning-foreground: oklch(0.16 0.012 255);
 
-  --radius: 0.75rem;
+  --border: oklch(0.34 0.015 250);
+  --border-strong: oklch(0.46 0.02 245);
+  --input: oklch(0.24 0.014 255);
+  --ring: oklch(0.74 0.07 65);
+
+  --radius: 0.9rem;
 }
 
 @theme inline {
-  --font-sans: var(--font-sans), 'Pontano Sans Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans), 'Work Sans Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), 'Geist Mono Fallback', ui-monospace, monospace;
-  --font-display: var(--font-display), 'Georgia', serif;
-  --font-accent: var(--font-accent), 'Georgia', serif;
+  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-accent), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -101,35 +97,36 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   html {
-    background-color: var(--background);
+    background: var(--background);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
+
   body {
     @apply bg-transparent text-foreground;
     font-feature-settings: 'ss01', 'cv11';
   }
+
   ::selection {
-    background: color-mix(in oklab, var(--foreground) 14%, transparent);
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
     color: var(--foreground);
   }
 
-  /* Display and accent never italicize — they are wide & geometric. */
   .font-display {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.012em;
+    font-weight: 700;
+    letter-spacing: -0.04em;
   }
+
   .font-accent {
     font-family: var(--font-accent);
     font-weight: 400;
-    letter-spacing: 0.005em;
+    letter-spacing: 0.015em;
   }
 
-  /* Hide the system cursor on pointer-fine devices — replaced by
-     CustomCursor. Falls back gracefully on touch. */
   @media (pointer: fine) {
     html.has-custom-cursor,
     html.has-custom-cursor * {
@@ -139,29 +136,16 @@
 }
 
 @layer utilities {
-  /* ────────────────────────────────────────────────────────────
-     Background atmosphere.
-     Layer 1 — paper base with soft warm vignette.
-     Layer 2 — architectural hairline grid (very faint).
-     Layer 3 — aperture: a drifting radial glow that breathes
-     with the page. Subtle, never spectacle.
-  ──────────────────────────────────────────────────────────── */
   .bg-base {
     position: fixed;
     inset: 0;
     z-index: -3;
     pointer-events: none;
     background:
-      radial-gradient(
-        ellipse 80% 60% at 50% 0%,
-        oklch(0.98 0.005 85 / 0.9),
-        transparent 70%
-      ),
-      linear-gradient(
-        180deg,
-        oklch(0.97 0.004 85) 0%,
-        oklch(0.95 0.005 80) 100%
-      );
+      radial-gradient(circle at 16% 18%, oklch(0.56 0.05 250 / 0.25), transparent 28%),
+      radial-gradient(circle at 82% 20%, oklch(0.76 0.08 65 / 0.18), transparent 24%),
+      radial-gradient(circle at 50% 88%, oklch(0.62 0.06 35 / 0.12), transparent 30%),
+      linear-gradient(180deg, oklch(0.13 0.01 255) 0%, oklch(0.17 0.014 255) 42%, oklch(0.14 0.012 255) 100%);
   }
 
   .bg-grid {
@@ -170,14 +154,11 @@
     z-index: -2;
     pointer-events: none;
     background-image:
-      linear-gradient(to right, oklch(0.18 0.006 60 / 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(0.18 0.006 60 / 0.04) 1px, transparent 1px);
-    background-size: 96px 96px;
-    mask-image: radial-gradient(
-      ellipse 70% 60% at 50% 35%,
-      black 40%,
-      transparent 85%
-    );
+      linear-gradient(to right, oklch(0.95 0.01 80 / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.95 0.01 80 / 0.035) 1px, transparent 1px);
+    background-size: 84px 84px;
+    mask-image: radial-gradient(circle at 50% 40%, black 24%, transparent 86%);
+    opacity: 0.44;
   }
 
   .bg-aperture {
@@ -186,23 +167,16 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(
-        ellipse 55% 38% at 78% 18%,
-        oklch(0.82 0.04 80 / 0.35),
-        transparent 70%
-      ),
-      radial-gradient(
-        ellipse 45% 35% at 18% 78%,
-        oklch(0.80 0.05 140 / 0.22),
-        transparent 70%
-      );
+      radial-gradient(circle at 70% 22%, oklch(0.74 0.08 60 / 0.22), transparent 24%),
+      radial-gradient(circle at 18% 78%, oklch(0.68 0.05 245 / 0.18), transparent 26%),
+      radial-gradient(circle at 50% 48%, oklch(0.95 0.01 80 / 0.03), transparent 30%);
     will-change: transform, opacity;
-    animation: apertureBreath 18s ease-in-out infinite alternate;
+    animation: apertureBreath 16s ease-in-out infinite alternate;
   }
 
   @keyframes apertureBreath {
     0% {
-      opacity: 0.85;
+      opacity: 0.78;
       transform: translate3d(0, 0, 0) scale(1);
     }
     100% {
@@ -217,28 +191,28 @@
     }
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Panels & cards.
-  ──────────────────────────────────────────────────────────── */
   .panel {
     position: relative;
     background: color-mix(in oklab, var(--surface) 92%, transparent);
-    border: 1px solid var(--border);
+    border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
     border-radius: var(--radius-lg);
     box-shadow:
-      0 1px 0 oklch(1 0 0 / 0.6) inset,
-      0 0.5px 0 oklch(0.18 0.006 60 / 0.04),
-      0 12px 40px -24px oklch(0.18 0.006 60 / 0.18);
+      inset 0 1px 0 oklch(0.98 0.01 80 / 0.05),
+      0 1px 0 oklch(0.08 0.01 255 / 0.36),
+      0 32px 80px -52px oklch(0.04 0.01 255 / 0.7);
+    backdrop-filter: blur(18px);
   }
 
   .panel-strong {
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
+    background:
+      linear-gradient(180deg, oklch(0.24 0.016 252 / 0.98) 0%, oklch(0.2 0.014 255 / 0.96) 100%);
+    border: 1px solid color-mix(in oklab, var(--border-strong) 82%, transparent);
     border-radius: var(--radius-xl);
     box-shadow:
-      0 1px 0 oklch(1 0 0 / 0.8) inset,
-      0 1px 0 oklch(0.18 0.006 60 / 0.06),
-      0 30px 80px -40px oklch(0.18 0.006 60 / 0.25);
+      inset 0 1px 0 oklch(0.98 0.01 80 / 0.06),
+      0 1px 0 oklch(0.05 0.01 255 / 0.55),
+      0 40px 100px -58px oklch(0.03 0.012 255 / 0.82);
+    backdrop-filter: blur(22px);
   }
 
   .hairline {
@@ -246,10 +220,6 @@
     height: 1px;
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Metadata — small uppercase monospace labels used across the
-     product DNA (section indices, eyebrow labels, status chips).
-  ──────────────────────────────────────────────────────────── */
   .meta {
     font-family: var(--font-mono);
     font-size: 10.5px;
@@ -258,12 +228,6 @@
     color: var(--muted-foreground);
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Motion primitives.
-     - reveal: blur-to-sharp + gentle rise on scroll entry
-     - scale-reveal: subtle zoom entry for preview layers
-     - lift: hover lift for interactive modules
-  ──────────────────────────────────────────────────────────── */
   .reveal {
     opacity: 0;
     filter: blur(12px);
@@ -274,11 +238,13 @@
       transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, filter, transform;
   }
+
   .reveal.is-visible {
     opacity: 1;
     filter: blur(0);
     transform: translate3d(0, 0, 0);
   }
+
   .reveal[data-delay="1"].is-visible { transition-delay: 80ms; }
   .reveal[data-delay="2"].is-visible { transition-delay: 160ms; }
   .reveal[data-delay="3"].is-visible { transition-delay: 240ms; }
@@ -293,6 +259,7 @@
       transform 1100ms cubic-bezier(0.22, 1, 0.36, 1),
       filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
+
   .scale-reveal.is-visible {
     opacity: 1;
     transform: scale(1);
@@ -303,15 +270,17 @@
     transition:
       transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
       border-color 400ms ease,
-      box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      background 300ms ease;
   }
+
   .lift:hover {
     transform: translate3d(0, -4px, 0);
     border-color: var(--border-strong);
     box-shadow:
-      0 1px 0 oklch(1 0 0 / 0.8) inset,
-      0 2px 0 oklch(0.18 0.006 60 / 0.08),
-      0 40px 80px -40px oklch(0.18 0.006 60 / 0.35);
+      inset 0 1px 0 oklch(0.98 0.01 80 / 0.08),
+      0 2px 0 oklch(0.04 0.01 255 / 0.48),
+      0 40px 90px -50px oklch(0.04 0.012 255 / 0.82);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -323,22 +292,17 @@
     }
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Scrollbars.
-  ──────────────────────────────────────────────────────────── */
   .scrollbar-hidden {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
+
   .scrollbar-hidden::-webkit-scrollbar {
     display: none;
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Typography rhythm helpers.
-  ──────────────────────────────────────────────────────────── */
   .display-kerning {
-    letter-spacing: -0.018em;
+    letter-spacing: -0.04em;
     line-height: 0.94;
   }
 
@@ -347,25 +311,14 @@
     align-items: center;
     gap: 0.75rem;
   }
+
   .eyebrow::before {
     content: '';
     width: 28px;
     height: 1px;
-    background: var(--border-strong);
+    background: color-mix(in oklab, var(--accent) 44%, var(--border));
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Custom cursor — [Build] pill that follows the pointer, plus a
-     small precision dot. The pill grows on interactive targets.
-  ──────────────────────────────────────────────────────────── */
-  .cursor-root {
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 100;
-    mix-blend-mode: normal;
-  }
   .cursor-dot {
     position: fixed;
     top: 0;
@@ -379,14 +332,15 @@
     pointer-events: none;
     z-index: 101;
   }
+
   .cursor-pill {
     position: fixed;
     top: 0;
     left: 0;
-    padding: 6px 12px 5px;
+    padding: 7px 13px 6px;
     border-radius: 9999px;
-    background: var(--foreground);
-    color: var(--background);
+    background: color-mix(in oklab, var(--accent) 86%, white 6%);
+    color: oklch(0.14 0.01 255);
     font-family: var(--font-accent);
     font-size: 11px;
     letter-spacing: 0.04em;
@@ -395,32 +349,33 @@
     transition:
       opacity 260ms cubic-bezier(0.22, 1, 0.36, 1),
       transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-      background 200ms ease;
+      background 200ms ease,
+      color 200ms ease;
     opacity: 0;
     white-space: nowrap;
     pointer-events: none;
     z-index: 101;
-    box-shadow: 0 10px 24px -12px oklch(0.18 0.006 60 / 0.4);
+    box-shadow: 0 18px 42px -22px oklch(0.06 0.01 255 / 0.9);
   }
+
   .cursor-pill.is-visible {
     opacity: 1;
     transform: translate3d(calc(-50% + 18px), calc(-50% - 18px), 0) scale(1);
   }
+
   .cursor-pill.is-interactive {
-    background: var(--accent);
-    transform: translate3d(calc(-50% + 22px), calc(-50% - 22px), 0) scale(1.06);
+    background: color-mix(in oklab, var(--highlight) 66%, var(--accent) 30%);
+    color: var(--foreground);
+    transform: translate3d(calc(-50% + 22px), calc(-50% - 22px), 0) scale(1.08);
   }
+
   @media (pointer: coarse) {
-    .cursor-root,
     .cursor-dot,
     .cursor-pill {
       display: none !important;
     }
   }
 
-  /* ────────────────────────────────────────────────────────────
-     Ruler — hairline scale used as a decorative product motif.
-  ──────────────────────────────────────────────────────────── */
   .ruler {
     background-image: repeating-linear-gradient(
       to right,
@@ -429,5 +384,30 @@
       transparent 1px,
       transparent 32px
     );
+  }
+
+  .ring-gradient {
+    position: relative;
+  }
+
+  .ring-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      150deg,
+      oklch(0.88 0.06 72 / 0.32),
+      oklch(0.62 0.05 245 / 0.18) 34%,
+      oklch(0.38 0.02 252 / 0.24) 68%,
+      oklch(0.8 0.08 55 / 0.2)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
   }
 }
