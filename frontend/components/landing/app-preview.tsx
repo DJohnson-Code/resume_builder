@@ -248,7 +248,7 @@ function Bullet({
 
 function Mark({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1 text-foreground">
+    <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1 text-foreground">
       {children}
     </span>
   )

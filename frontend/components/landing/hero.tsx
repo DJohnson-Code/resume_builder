@@ -72,12 +72,15 @@ export function Hero() {
               </span>
             </div>
 
-            <h1 className="mt-8 max-w-[10.5ch] font-display text-[clamp(3rem,8vw,7rem)] leading-[0.9] text-foreground">
-              <span className="font-accent text-accent">Build</span> the resume
-              <br />
-              that gets
-              <span className="font-accent ml-3 inline-block text-accent">
-                read.
+            <h1 className="mt-8 max-w-[17ch] font-display text-[clamp(2.6rem,7vw,5.8rem)] leading-[1.04] tracking-[-0.025em] text-foreground">
+              <span className="block">
+                <span className="font-accent text-accent">Build</span> the resume
+              </span>
+              <span className="block">
+                that gets
+                <span className="font-accent ml-3 inline-block text-accent">
+                  read.
+                </span>
               </span>
             </h1>
 
@@ -121,7 +124,7 @@ export function Hero() {
             <div ref={previewRef} className="relative will-change-transform">
               <div
                 aria-hidden
-                className="absolute -inset-x-10 -inset-y-10 -z-10 rounded-[28px] bg-[radial-gradient(ellipse_at_top,oklch(0.82_0.04_80/0.45),transparent_70%)]"
+                className="absolute -inset-x-10 -inset-y-10 -z-10 rounded-[28px] bg-[radial-gradient(ellipse_at_top,oklch(0.88_0.12_62/0.38),transparent_72%)]"
               />
               <AppPreview variant="compact" />
 
@@ -183,14 +186,14 @@ function Annotation({
 }) {
   const tone =
     kind === "OK"
-      ? "bg-[oklch(0.64_0.11_145)]"
+      ? "bg-[oklch(0.64_0.12_145)]"
       : kind === "WARN"
-        ? "bg-[oklch(0.78_0.13_80)]"
+        ? "bg-[oklch(0.76_0.13_78)]"
         : "bg-foreground"
   return (
     <div
       className={[
-        "flex items-center gap-2 rounded-full border border-border bg-surface/90 px-3 py-1.5 text-[11px] text-foreground shadow-[0_10px_30px_-18px_oklch(0.18_0.006_60/0.35)] backdrop-blur",
+        "flex items-center gap-2 rounded-full border border-border bg-surface/90 px-3 py-1.5 text-[11px] text-foreground shadow-[0_12px_30px_-18px_oklch(0.3_0.02_55/0.28)] backdrop-blur",
         className ?? "",
       ].join(" ")}
     >

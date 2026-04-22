@@ -206,18 +206,18 @@ function AssistPreview() {
       <div className="bg-surface-2/40 p-4">
         <p className="meta">AFTER</p>
         <p className="mt-3 text-[12.5px] leading-[1.6] text-foreground">
-          <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+          <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
             Led
           </span>{" "}
           migration of 14 services, cutting p99 latency by{" "}
-          <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+          <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
             41%
           </span>
           .
         </p>
         <p className="mt-3 text-[12.5px] leading-[1.6] text-foreground">
           Shipped the billing rewrite with{" "}
-          <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+          <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
             zero incidents
           </span>{" "}
           over 9 months.

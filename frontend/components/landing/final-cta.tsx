@@ -10,11 +10,11 @@ export function FinalCta() {
           <div className="panel-strong relative overflow-hidden rounded-[28px] px-8 py-16 md:px-16 md:py-24">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,oklch(0.74_0.08_65/0.24),transparent_60%)]"
+              className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,oklch(0.86_0.12_58/0.32),transparent_64%)]"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-[linear-gradient(180deg,transparent,oklch(0.16_0.014_255/0.6))]"
+              className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-[linear-gradient(180deg,transparent,oklch(0.5_0.02_60/0.08))]"
             />
 
             <p className="meta">§ 05 · START</p>

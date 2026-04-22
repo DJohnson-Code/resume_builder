@@ -12,12 +12,39 @@ const LINKS = [
 
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false)
+  const [active, setActive] = useState<string | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    const targets = LINKS.map((l) => document.getElementById(l.href.slice(1)))
+      .filter((el): el is HTMLElement => el !== null)
+    if (targets.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        if (visible.length > 0) {
+          setActive(`#${visible[0].target.id}`)
+        } else if (window.scrollY < window.innerHeight * 0.5) {
+          setActive(null)
+        }
+      },
+      {
+        rootMargin: "-40% 0px -55% 0px",
+        threshold: [0, 0.2, 0.5, 1],
+      },
+    )
+
+    targets.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
 
   return (
@@ -32,7 +59,7 @@ export function SiteNav() {
           className={cn(
             "flex w-full items-center justify-between rounded-full border px-5 py-2.5 transition-all duration-500",
             scrolled
-              ? "border-border-strong bg-surface/78 backdrop-blur-2xl shadow-[0_24px_60px_-36px_oklch(0.04_0.01_255/0.9)]"
+              ? "border-border-strong bg-surface/82 backdrop-blur-2xl shadow-[0_26px_60px_-38px_oklch(0.3_0.02_55/0.28)]"
               : "border-transparent bg-transparent",
           )}
         >
@@ -46,16 +73,24 @@ export function SiteNav() {
             </span>
           </a>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {l.label}
-              </a>
-            ))}
+          <nav className="hidden items-center gap-1.5 md:flex">
+            {LINKS.map((l) => {
+              const isActive = active === l.href
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={cn(
+                    "inline-flex h-9 items-center rounded-full px-3.5 text-[13px] transition-[background-color,color,box-shadow] duration-300",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-[0_10px_26px_-14px_oklch(0.3_0.02_55/0.42)]"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {l.label}
+                </a>
+              )
+            })}
           </nav>
 
           <div className="flex items-center gap-2">

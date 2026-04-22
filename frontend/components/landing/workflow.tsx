@@ -105,7 +105,7 @@ export function Workflow() {
           the workflow, keeping the sequence spatial rather than just linear. */}
       <div
         ref={wrapperRef}
-        style={{ height: `${100 + STEPS.length * 70}vh` }}
+        style={{ height: `${120 + STEPS.length * 110}vh` }}
         className="relative"
       >
         <div className="sticky top-0 flex h-screen items-center">
@@ -463,26 +463,26 @@ function StageImprove() {
             </p>
           </div>
         </div>
-        <div className="bg-[oklch(0.995_0.003_85)] p-5">
+        <div className="bg-[oklch(0.96_0.015_85)] p-5">
           <p className="meta">AFTER · kerning</p>
           <div className="mt-3 space-y-3 text-[13.5px] leading-[1.6] text-foreground">
             <p>
-              <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+              <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
                 Led
               </span>{" "}
               migration of 14 services to an event-driven core, cutting p99
-              latency by <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">41%</span>.
+              latency by <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">41%</span>.
             </p>
             <p>
               Shipped the billing rewrite with{" "}
-              <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+              <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
                 zero customer-impacting incidents
               </span>{" "}
               over 9 months.
             </p>
             <p>
               Mentored 4 engineers;{" "}
-              <span className="rounded-[3px] bg-[oklch(0.92_0.08_110)] px-1">
+              <span className="rounded-[3px] bg-[oklch(0.9_0.11_92)] px-1">
                 two promoted to senior
               </span>{" "}
               within a year.
@@ -506,7 +506,7 @@ function StageGenerate() {
   return (
     <StageFrame title="KERNING · GENERATE" chip="ready">
       <div className="grid h-full grid-cols-[minmax(0,1fr)_220px]">
-        <div className="relative bg-[oklch(0.995_0.003_85)] p-6 md:p-7">
+        <div className="relative bg-[oklch(0.96_0.015_85)] p-6 md:p-7">
           <p className="font-display text-3xl leading-[1.02] tracking-[-0.015em]">
             Jordan Avery
           </p>
